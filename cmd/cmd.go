@@ -5,11 +5,13 @@ import (
 	"net/url"
 	"time"
 
+	"strconv"
+
+	"github.com/daniellowtw/xavier/client"
 	"github.com/daniellowtw/xavier/feed"
 	"github.com/go-xorm/xorm"
 	"github.com/mmcdole/gofeed"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 var (
@@ -75,7 +77,7 @@ func deleteFeed(e *xorm.Engine, id int) error {
 	if err != nil {
 		return fmt.Errorf("no such feed: %v\n", err)
 	}
-	n, err := e.Where(fmt.Sprintf("feed_id = %d",id)).Delete(&feed.FeedItem{})
+	n, err := e.Where(fmt.Sprintf("feed_id = %d", id)).Delete(&feed.FeedItem{})
 	if err != nil {
 		return fmt.Errorf("cannot find all feed items: %v\n", err)
 	}
@@ -157,10 +159,12 @@ func updateFeedFromURL(f *feed.FeedSource, e *xorm.Engine) error {
 }
 
 func addFeed(e *xorm.Engine, url string) error {
+	c := client.New()
 	fp := gofeed.NewParser()
+	fp.Client = c
 	f, err := fp.ParseURL(url)
 	if err != nil {
-		return err
+		return fmt.Errorf("add: cannot parse URL: %v", err)
 	}
 	item := &feed.FeedSource{
 		Title:       f.Title,
@@ -171,11 +175,19 @@ func addFeed(e *xorm.Engine, url string) error {
 		LastChecked: time.Now(),
 	}
 	_, err = e.Insert(item)
+	if err != nil {
+		return err
+	}
 	for _, i := range f.Items {
 		_, err := e.Insert(feed.ToFeedItem(item.Id, i))
 		if err != nil {
 			return err
 		}
+	}
+	item.TotalCount += len(f.Items)
+	item.UnreadCount += len(f.Items)
+	if _, err := e.Id(item.Id).Update(item); err != nil {
+		return err
 	}
 	fmt.Printf("Added %d items for feed %s\n", len(f.Items), f.Title)
 	return err
