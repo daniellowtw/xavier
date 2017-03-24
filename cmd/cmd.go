@@ -9,6 +9,7 @@ import (
 
 	"github.com/daniellowtw/xavier/client"
 	"github.com/daniellowtw/xavier/feed"
+	"github.com/daniellowtw/xavier/term_app"
 	"github.com/go-xorm/xorm"
 	"github.com/mmcdole/gofeed"
 	"github.com/spf13/cobra"
@@ -39,7 +40,8 @@ var (
 	ListAllCmd = &cobra.Command{
 		Use: "list",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return listAllFeeds(e)
+			c := feed.NewClient(e)
+			return (c.ListAllFeeds())
 		},
 	}
 
@@ -55,6 +57,16 @@ var (
 				return err
 			}
 			return deleteFeed(e, i)
+		},
+	}
+
+	ReadCmd = &cobra.Command{
+		Use: "read",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app := &term_app.App{
+				Client: feed.NewClient(e),
+			}
+			return app.Run()
 		},
 	}
 	e *xorm.Engine
@@ -89,19 +101,6 @@ func deleteFeed(e *xorm.Engine, id int) error {
 	fmt.Printf("Deleted feed %s\n", fs[0].Title)
 	return nil
 }
-func listAllFeeds(e *xorm.Engine) error {
-	var fs []*feed.FeedSource
-	err := e.Find(&fs)
-	if err != nil {
-		return err
-	}
-	fmt.Println("id | title | unread | total")
-	for _, f := range fs {
-		fmt.Printf("%d %s %d %d\n", f.Id, f.Title, f.UnreadCount, f.TotalCount)
-	}
-	return nil
-}
-
 func updateAllFeeds(e *xorm.Engine) error {
 	var fs []*feed.FeedSource
 	err := e.Where("active = 1").Find(&fs)
