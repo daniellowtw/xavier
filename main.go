@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/daniellowtw/xavier/cmd"
+	"github.com/spf13/cobra"
 )
 
 func main() {
@@ -13,7 +13,7 @@ func main() {
 		Use: os.Args[0],
 	}
 	verCmd := &cobra.Command{
-		Use:"version",
+		Use:   "version",
 		Short: "Print the current version of the program",
 		Run: func(*cobra.Command, []string) {
 			fmt.Println(version)

@@ -134,6 +134,7 @@ func updateFeed(e *xorm.Engine, feedId int64) error {
 
 func updateFeedFromURL(f *feed.FeedSource, e *xorm.Engine) error {
 	fp := gofeed.NewParser()
+	fp.Client = client.New()
 	gf, err := fp.ParseURL(f.UrlSource)
 	if err != nil {
 		return err
@@ -141,8 +142,16 @@ func updateFeedFromURL(f *feed.FeedSource, e *xorm.Engine) error {
 	lastUpdated := f.LastChecked
 	var updatedItemCount int
 	for _, i := range gf.Items {
-		if i.PublishedParsed.Before(lastUpdated) {
-			continue
+		if i.PublishedParsed != nil {
+			if i.PublishedParsed.Before(lastUpdated) {
+				continue
+			}
+		} else if i.UpdatedParsed != nil {
+			if i.UpdatedParsed.Before(lastUpdated) {
+				continue
+			}
+		} else {
+			fmt.Println("Cannot parsed published time nor updated time. Feed will most likely have duplicated items.")
 		}
 		updatedItemCount++
 		_, err := e.Insert(feed.ToFeedItem(f.Id, i))
