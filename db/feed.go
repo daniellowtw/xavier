@@ -16,10 +16,6 @@ type FeedSource struct {
 	Title       string
 	Description string
 	UrlSource   string `xorm:"unique"`
-	// TODO deprecate
-	UnreadCount int
-	// TODO deprecate
-	TotalCount  int
 	Status      string // TODO
 	LastUpdated *time.Time
 	LastChecked time.Time

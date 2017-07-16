@@ -80,17 +80,6 @@ func (c *Client) GetAllFeeds() (res []*FeedSource, err error) {
 	err = c.e.Find(&res)
 	return
 }
-func (c *Client) ListAllFeeds() error {
-	fs, err := c.GetAllFeeds()
-	if err != nil {
-		return err
-	}
-	fmt.Println("id | title | unread | total")
-	for _, f := range fs {
-		fmt.Printf("%d %s %d %d\n", f.Id, f.Title, f.UnreadCount, f.TotalCount)
-	}
-	return nil
-}
 
 func (c *Client) ListFeedItems(id string) error {
 	fs, err := c.GetFeedItems(id)

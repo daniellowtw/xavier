@@ -42,8 +42,7 @@ var (
 			if err != nil {
 				return err
 			}
-			for _, g := range feeds {
-				f := g.FeedSource
+			for _, f := range feeds {
 				fmt.Println(f.Id, f.Title, f.Description, f.UnreadCount, f.TotalCount)
 			}
 			return nil
