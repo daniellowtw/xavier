@@ -78,7 +78,7 @@ func init() {
 		panic(err)
 	}
 	e = ee
-	s = &api.Service{StoreEngine: e}
+	s = api.NewService(db.NewClient(e))
 	e.ShowSQL(true)
 	e.Logger().SetLevel(core.LOG_DEBUG)
 }

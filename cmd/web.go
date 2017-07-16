@@ -15,10 +15,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			r := mux.NewRouter()
 			subRouter := r.PathPrefix("/_api").Subrouter()
-			s := api.Service{
-				StoreEngine: e,
-			}
-			s.Register(subRouter)
+			api.Register(s, subRouter)
 			r.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(r.URL.Path)
 			})
