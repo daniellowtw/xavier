@@ -11,6 +11,9 @@
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
+    "font-awesome": "^4.7.0",
+    "swal": "^0.1.0",
+    "sweetalert2": "^6.6.6",
     "vue": "^2.3.3"
   },
   "devDependencies": {

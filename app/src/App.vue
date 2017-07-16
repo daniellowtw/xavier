@@ -1,17 +1,31 @@
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
-    <hello></hello>
+  <div id="app" class="container">
+    <nav-bar @change-mode="changeMode"></nav-bar>
+    <feed :mode="mode" v-show="mode == 'feed'"></feed>
   </div>
 </template>
 
 <script>
-import Hello from './components/Hello'
+import Feed from './components/Feed'
+import NavBar from './components/NavBar'
 
 export default {
   name: 'app',
   components: {
-    Hello
+    Feed,
+    NavBar
+  },
+  created() {
+  },
+  data() {
+    return {
+      mode: 'feed'
+    }
+  },
+  methods: {
+    changeMode(mode) {
+      this.mode = mode
+    }
   }
 }
 </script>
@@ -23,6 +37,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
