@@ -1,30 +1,37 @@
 <template>
   <div id="app" class="container">
-    <nav-bar @change-mode="changeMode"></nav-bar>
-    <feed :mode="mode" v-show="mode == 'feed'"></feed>
+    <nav-bar :isDebug="isDebug" @change-mode="changeMode" @toggleDebug="toggleDebug"></nav-bar>
+    <feed :isDebug="isDebug" :mode="mode" v-show="mode == 'feed'"></feed>
+    <news :isDebug="isDebug" :mode="mode" v-show="mode == 'news'"></news>
   </div>
 </template>
 
 <script>
 import Feed from './components/Feed'
+import News from './components/News'
 import NavBar from './components/NavBar'
 
 export default {
   name: 'app',
   components: {
     Feed,
-    NavBar
+    NavBar,
+    News
   },
   created() {
   },
   data() {
     return {
-      mode: 'feed'
+      mode: 'feed',
+      isDebug: false
     }
   },
   methods: {
     changeMode(mode) {
       this.mode = mode
+    },
+    toggleDebug(mode) {
+      this.isDebug = !this.isDebug
     }
   }
 }

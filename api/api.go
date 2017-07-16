@@ -1,17 +1,18 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
+	"strconv"
 	"time"
 
-	"encoding/json"
 	"github.com/daniellowtw/xavier/client"
 	"github.com/daniellowtw/xavier/db"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-xorm/xorm"
 	"github.com/gorilla/mux"
 	"github.com/mmcdole/gofeed"
-	"net/http"
-	"strconv"
 )
 
 // Service is implements the API
@@ -28,10 +29,10 @@ func (s *Service) AddFeed(url string) error {
 		return fmt.Errorf("add: cannot parse URL: %v", err)
 	}
 	var existing []*db.FeedSource
-	if err := s.StoreEngine.Where(fmt.Sprintf("url_source='%s'", url)).Find(&existing); err!= nil {
+	if err := s.StoreEngine.Where(fmt.Sprintf("url_source='%s'", url)).Find(&existing); err != nil {
 		return fmt.Errorf("add: cannot check for existing feed: %v", err)
 	}
-	if len(existing) > 0{
+	if len(existing) > 0 {
 		return fmt.Errorf("add: URL already exist: %s", url)
 	}
 	item := &db.FeedSource{
@@ -145,22 +146,73 @@ func (s *Service) UpdateAllFeeds() error {
 	return nil
 }
 
-func (s *Service) ListAllFeeds() ([]*db.FeedSource, error) {
-	var fs []*db.FeedSource
-	err := s.StoreEngine.Where("active = 1").Find(&fs)
+// TODO cleanup
+type temp struct {
+	db.FeedSource `xorm:"extends"`
+	Un int64
+}
+func (temp) TableName() string {
+	return "feed_item"
+}
+
+func (s *Service) ListAllFeeds() ([]*temp, error) {
+	var fs []*temp
+	err := s.StoreEngine.SQL(`select *, (select count(*) from feed_item as y where y.feed_id = s.id and read = 0) as un from feed_source s`).Find(&fs)
+	//err := s.StoreEngine.Where("active = 1").Find(&fs)
 	if err != nil {
 		return nil, err
 	}
 	return fs, nil
 }
 
-func (s *Service) ListAllNews(feedID int64) ([]*db.FeedItem, error) {
+func (s *Service) ListAllNews() ([]*db.FeedItem, error) {
+	var fs []*db.FeedItem
+	err := s.StoreEngine.Find(&fs)
+	if err != nil {
+		return nil, err
+	}
+	return fs, nil
+}
+
+type filter func(s *xorm.Session) *xorm.Session
+
+func filterUnread() filter {
+	return func(s *xorm.Session) *xorm.Session {
+		return s.Where("read = 0")
+	}
+}
+
+func (s *Service) Search(filters ...filter) ([]*db.FeedItem, error) {
+	println("searching news")
+	var fs []*db.FeedItem
+	starting := s.StoreEngine.NewSession()
+	for _, f := range filters {
+		starting = f(starting)
+	}
+	err := starting.Find(&fs)
+	if err != nil {
+		return nil, err
+	}
+	return fs, nil
+}
+
+func (s *Service) ListAllNewsForFeed(feedID int64) ([]*db.FeedItem, error) {
 	var fs []*db.FeedItem
 	err := s.StoreEngine.Where(fmt.Sprintf("feed_id = %d", feedID)).Find(&fs)
 	if err != nil {
 		return nil, err
 	}
 	return fs, nil
+}
+
+func (s *Service) MarkAsRead(feedID, newsID int64) error {
+	fs := db.FeedItem{
+		Read: true,
+	}
+	if _, err := s.StoreEngine.Id(newsID).Cols("read").Update(&fs); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *Service) Register(group *mux.Router) {
@@ -209,18 +261,45 @@ func (s *Service) Register(group *mux.Router) {
 			writeErr(w, http.StatusBadRequest, fmt.Errorf("cannot parse feed ID"))
 			return
 		}
-		things, err := s.ListAllNews(n)
+		things, err := s.ListAllNewsForFeed(n)
 		if err != nil {
 			writeErr(w, http.StatusInternalServerError, err)
 			return
 		}
 		json.NewEncoder(w).Encode(things)
 	})
-	group.Methods(http.MethodGet).Path("/feeds/{feed_id}/news/{news_id}").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	group.Methods(http.MethodPost).Path("/feeds/{feed_id}/news/{news_id}").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		newsId, err := strconv.ParseInt(mux.Vars(r)["news_id"], 10, 64)
+		feedID, err := strconv.ParseInt(mux.Vars(r)["feed_id"], 10, 64)
+		if err != nil {
+			writeErr(w, http.StatusBadRequest, err)
+			return
+		}
+		r.ParseForm()
+		action := r.Form.Get("action")
+		switch action {
+		case "read":
+			writeErr(w, http.StatusBadRequest, s.MarkAsRead(feedID, newsId))
+			return
+		default:
+			spew.Dump(action, r.Form)
+		}
+	})
+	group.Methods(http.MethodGet).Path("/news").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		things, err := s.Search(filterUnread())
+		println("filtere")
+		if err != nil {
+			writeErr(w, http.StatusInternalServerError, err)
+			return
+		}
+		json.NewEncoder(w).Encode(things)
 	})
 }
 
 func writeErr(w http.ResponseWriter, statusCode int, err error) {
+	if err == nil {
+		return
+	}
 	w.WriteHeader(statusCode)
 	w.Write([]byte(err.Error()))
 }

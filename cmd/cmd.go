@@ -10,6 +10,7 @@ import (
 	"github.com/daniellowtw/xavier/db"
 	"github.com/go-xorm/xorm"
 	"github.com/spf13/cobra"
+	"github.com/go-xorm/core"
 )
 
 var (
@@ -41,7 +42,8 @@ var (
 			if err != nil {
 				return err
 			}
-			for _, f := range feeds {
+			for _, g := range feeds {
+				f := g.FeedSource
 				fmt.Println(f.Id, f.Title, f.Description, f.UnreadCount, f.TotalCount)
 			}
 			return nil
@@ -77,4 +79,6 @@ func init() {
 	}
 	e = ee
 	s = &api.Service{StoreEngine: e}
+	e.ShowSQL(true)
+	e.Logger().SetLevel(core.LOG_DEBUG)
 }

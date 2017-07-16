@@ -1,5 +1,6 @@
 <template>
   <section class="section">
+    <feed-bar></feed-bar>
       <div class="columns">
         <div class="column is-12">
           <table class="table is-narrow is-bordered">
@@ -16,7 +17,11 @@
                 <td>
                   <a :href="feed.UrlSource">{{feed.Title}}</a>
                 </td>
-                <td>{{feed.Description}}</td>
+                <td>{{feed.Description}}
+                  <div v-show="isDebug">
+                    {{feed}}
+                  </div>
+                </td>
                 <td>{{feed.UnreadCount}}/{{feed.TotalCount}}</td>
                 <td>{{feed.LastUpdated}}</td>
                 <td class="is-icon">
@@ -42,10 +47,13 @@
 <script>
 var __API__ = '/api/feeds'
 import Pagination from './Pagination.vue'
+import FeedBar from './FeedBar.vue'
 export default {
+  props: ['isDebug'],
   name: 'feed',
   components: [
-    Pagination
+    Pagination,
+    FeedBar
   ],
   methods: {
     onChangePage(page) {

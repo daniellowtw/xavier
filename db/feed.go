@@ -10,12 +10,15 @@ import (
 )
 
 type FeedSource struct {
+	// auto public key
 	Id          int64
 	Active      bool
 	Title       string
 	Description string
 	UrlSource   string `xorm:"unique"`
+	// TODO deprecate
 	UnreadCount int
+	// TODO deprecate
 	TotalCount  int
 	Status      string // TODO
 	LastUpdated *time.Time
@@ -24,7 +27,8 @@ type FeedSource struct {
 }
 
 type FeedItem struct {
-	Id     int64
+	// auto public key
+	Id     int64 `xorm:"index"`
 	FeedId int64 `xorm:"index"`
 	Read   bool  `xorm:"index"`
 
