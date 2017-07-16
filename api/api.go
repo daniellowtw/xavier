@@ -27,6 +27,13 @@ func (s *Service) AddFeed(url string) error {
 	if err != nil {
 		return fmt.Errorf("add: cannot parse URL: %v", err)
 	}
+	var existing []*db.FeedSource
+	if err := s.StoreEngine.Where(fmt.Sprintf("url_source='%s'", url)).Find(&existing); err!= nil {
+		return fmt.Errorf("add: cannot check for existing feed: %v", err)
+	}
+	if len(existing) > 0{
+		return fmt.Errorf("add: URL already exist: %s", url)
+	}
 	item := &db.FeedSource{
 		Title:       f.Title,
 		UrlSource:   url,

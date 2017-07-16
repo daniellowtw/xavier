@@ -20,7 +20,7 @@ func main() {
 		},
 	}
 	rootCmd.AddCommand(verCmd)
-	rootCmd.AddCommand(cmd.AddCmd, cmd.UpdateAllCmd, cmd.ListAllCmd, cmd.DeleteCmd, cmd.ReadCmd, cmd.WebCmd)
+	rootCmd.AddCommand(cmd.AddCmd, cmd.UpdateAllCmd, cmd.ListAllCmd, cmd.DeleteCmd, cmd.WebCmd, cmd.ImportFeedSourceFromFileCmd)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 	}

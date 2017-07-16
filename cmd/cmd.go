@@ -8,7 +8,6 @@ import (
 
 	"github.com/daniellowtw/xavier/api"
 	"github.com/daniellowtw/xavier/db"
-	"github.com/daniellowtw/xavier/term_app"
 	"github.com/go-xorm/xorm"
 	"github.com/spf13/cobra"
 )
@@ -64,15 +63,6 @@ var (
 		},
 	}
 
-	ReadCmd = &cobra.Command{
-		Use: "read",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			app := &term_app.App{
-				Client: db.NewClient(e),
-			}
-			return app.Run()
-		},
-	}
 	e *xorm.Engine
 	s *api.Service
 )
