@@ -79,7 +79,7 @@ func Register(s *Service, group *mux.Router) {
 		}
 	})
 	group.Methods(http.MethodGet).Path("/news").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		things, err := s.Search(SearchParam{IncludeRead: true})
+		things, err := s.Search(SearchParam{IncludeRead: false})
 		println("filtere")
 		if err != nil {
 			writeErr(w, http.StatusInternalServerError, err)

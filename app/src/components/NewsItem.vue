@@ -14,6 +14,8 @@
       <div v-show="isDebug">
       {{news}}
       </div>
+      <div class="content" v-html="news.Description">
+      </div>
       <div class="content" v-html="news.Content">
       </div>
     </div>

@@ -43,6 +43,7 @@ func (s *FeedService) AddFeed(url string) error {
 	}
 	feedID, err := s.dbClient.AddFeed(item)
 	for _, i := range f.Items {
+		fixFeedItem(i)
 		err := s.dbClient.AddNews(feedID, db.ToFeedItem(item.Id, i))
 		if err != nil {
 			return err
@@ -62,6 +63,7 @@ func (s *FeedService) updateFeedFromURL(f *db.FeedSource) error {
 	lastUpdated := f.LastChecked
 	var updatedItemCount int
 	for _, i := range gf.Items {
+		fixFeedItem(i)
 		if i.PublishedParsed != nil {
 			if i.PublishedParsed.Before(lastUpdated) {
 				continue
@@ -119,4 +121,20 @@ func writeErr(w http.ResponseWriter, statusCode int, err error) {
 	}
 	w.WriteHeader(statusCode)
 	w.Write([]byte(err.Error()))
+}
+
+// parse the content module http://web.resource.org/rss/1.0/modules/content/
+func fixFeedItem(i *gofeed.Item) {
+	t1, ok := i.Extensions["content"]
+	if !ok {
+		return
+	}
+	t2, ok := t1["encoded"]
+	if !ok {
+		return
+	}
+	if len(t2) != 1 {
+		return
+	}
+	i.Content = t2[0].Value
 }

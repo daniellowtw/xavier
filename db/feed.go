@@ -28,15 +28,16 @@ type FeedItem struct {
 	FeedId int64 `xorm:"index"`
 	Read   bool  `xorm:"index"`
 
-	Title      string `xorm:"index"`
-	Published  *time.Time
-	LinkHref   string `xorm:"unique"`
-	Content    string
-	AuthorName string
-	Category   []string `xorm:"index"`
-	Guid       string
-	Enclosure  string
-	Custom     map[string]string
+	Title       string `xorm:"index"`
+	Published   *time.Time
+	LinkHref    string `xorm:"unique"`
+	Description string
+	Content     string
+	AuthorName  string
+	Category    []string `xorm:"index"`
+	Guid        string
+	Enclosure   string
+	Custom      map[string]string
 }
 
 func ToFeedItem(feedID int64, i *gofeed.Item) *FeedItem {
@@ -46,15 +47,16 @@ func ToFeedItem(feedID int64, i *gofeed.Item) *FeedItem {
 		author = i.Author.Name
 	}
 	return &FeedItem{
-		FeedId:     feedID,
-		Title:      i.Title,
-		AuthorName: author,
-		Category:   i.Categories,
-		Content:    i.Content,
-		LinkHref:   i.Link,
-		Published:  i.PublishedParsed,
-		Guid:       i.GUID,
-		Enclosure:  string(encl),
-		Custom:     i.Custom,
+		FeedId:      feedID,
+		Title:       i.Title,
+		AuthorName:  author,
+		Category:    i.Categories,
+		Description: i.Description,
+		Content:     i.Content,
+		LinkHref:    i.Link,
+		Published:   i.PublishedParsed,
+		Guid:        i.GUID,
+		Enclosure:   string(encl),
+		Custom:      i.Custom,
 	}
 }

@@ -79,5 +79,5 @@ func init() {
 	e = ee
 	s = api.NewService(db.NewClient(e))
 	e.ShowSQL(true)
-	e.Logger().SetLevel(core.LOG_DEBUG)
+	e.Logger().SetLevel(core.LOG_ERR)
 }
