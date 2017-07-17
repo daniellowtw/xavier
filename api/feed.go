@@ -14,6 +14,7 @@ import (
 type FeedService struct {
 	dbClient *db.Client
 }
+
 func (s *FeedService) ListAllFeeds() ([]*db.FeedSourceWithUnread, error) {
 	return s.dbClient.GetActiveFeedSources()
 }
@@ -33,6 +34,10 @@ func (s *FeedService) AddFeed(url string) error {
 	if err != nil {
 		return fmt.Errorf("add: cannot parse URL: %v", err)
 	}
+	favIcon, err := getFavIcon(f.Link)
+	if err != nil {
+		return err
+	}
 	item := &db.FeedSource{
 		Title:       f.Title,
 		UrlSource:   url,
@@ -40,6 +45,7 @@ func (s *FeedService) AddFeed(url string) error {
 		LastUpdated: f.UpdatedParsed,
 		Active:      true,
 		LastChecked: time.Now(),
+		FavIcon:     favIcon,
 	}
 	feedID, err := s.dbClient.AddFeed(item)
 	for _, i := range f.Items {

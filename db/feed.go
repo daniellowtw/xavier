@@ -20,6 +20,7 @@ type FeedSource struct {
 	LastUpdated *time.Time
 	LastChecked time.Time
 	Created     time.Time `xorm:"created"`
+	FavIcon     string
 }
 
 type FeedItem struct {

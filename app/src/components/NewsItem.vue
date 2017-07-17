@@ -2,7 +2,11 @@
   <div class="card">
     <header class="card-header clickable">
       <p class="card-header-title" v-on:click="toggleShow" v-bind:class="{read: (news.read===true)}">
-        {{news.Title}}
+        <span class="icon">
+          <i>
+            <img v-bind:src="fav">
+          </i>
+        </span> {{news.Title}}
       </p>
       <a class="card-header-icon">
         <span class="icon">
@@ -12,7 +16,7 @@
     </header>
     <div class="card-content" v-show="show">
       <div v-show="isDebug">
-      {{news}}
+        {{news}}
       </div>
       <div class="content" v-html="news.Description">
       </div>
@@ -29,10 +33,7 @@
 <script>
 import Vue from 'vue'
 export default Vue.component('news-item', {
-  props: ['news', 'isDebug'],
-  computed: {
-
-  },
+  props: ['news', 'isDebug', 'fav'],
   data() {
     return {
       show: false,
@@ -51,6 +52,7 @@ export default Vue.component('news-item', {
 .clickable {
   cursor: pointer;
 }
+
 .read {
   font-size: small;
 }

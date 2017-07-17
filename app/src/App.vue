@@ -1,8 +1,8 @@
 <template>
   <div id="app" class="container">
     <nav-bar :isDebug="isDebug" @change-mode="changeMode" @toggleDebug="toggleDebug"></nav-bar>
-    <feed :isDebug="isDebug" :mode="mode" v-show="mode == 'feed'"></feed>
-    <news :isDebug="isDebug" :mode="mode" v-show="mode == 'news'"></news>
+    <feed :isDebug="isDebug" :mode="mode" :feeds="sourcesList" v-show="mode == 'feed'"></feed>
+    <news :isDebug="isDebug" :mode="mode" :sources="sources" v-show="mode == 'news'"></news>
   </div>
 </template>
 
@@ -10,6 +10,8 @@
 import Feed from './components/Feed'
 import News from './components/News'
 import NavBar from './components/NavBar'
+import request from 'superagent'
+var __API__ = '/api'
 
 export default {
   name: 'app',
@@ -18,12 +20,12 @@ export default {
     NavBar,
     News
   },
-  created() {
-  },
   data() {
     return {
       mode: 'feed',
-      isDebug: false
+      isDebug: false,
+      sources: {},
+      sourcesList: []
     }
   },
   methods: {
@@ -32,7 +34,23 @@ export default {
     },
     toggleDebug(mode) {
       this.isDebug = !this.isDebug
+    },
+    loadSources() {
+      request.get(`${__API__}/feeds`)
+        .end((err, res) => {
+          if (err) {
+            console.log(err)
+            return
+          }
+          this.sourcesList = JSON.parse(res.text)
+          this.sourcesList.forEach(el => {
+            this.sources[el.Id] = el.FavIcon
+          }, this)
+        })
     }
+  },
+  created() {
+    this.loadSources()
   }
 }
 </script>

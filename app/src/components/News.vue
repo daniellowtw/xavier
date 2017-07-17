@@ -3,7 +3,7 @@
     <news-bar></news-bar>
     <div class="columns">
       <div class="column is-12">
-        <news-item v-for="feed in news" :key="feed.Id" :news="feed" :isDebug="isDebug" @read="markRead"></news-item>
+        <news-item v-for="newsItem in news" :key="newsItem.Id" :news="newsItem" :isDebug="isDebug" :fav="sources[newsItem.FeedId]" @read="markRead"></news-item>
         <pagination :total="total" :page="page" :items-per-page="itemsPerPage" @change-page="onChangePage"></pagination>
       </div>
     </div>
@@ -17,7 +17,7 @@ import NewsItem from './NewsItem.vue'
 import NewsBar from './NewsBar.vue'
 import request from 'superagent'
 export default {
-  props: ['isDebug'],
+  props: ['isDebug', 'sources'],
   name: 'news',
   components: [
     Pagination,
@@ -37,28 +37,27 @@ export default {
             return
           }
           news.read = true
-          console.log(res)
         })
     },
     loadNews() {
-      this.$http.get(`${__API__}/news`).then(
-        response => {
-          this.news = JSON.parse(response.body)
+      request.get(`${__API__}/news`)
+        .end((err, res) => {
+          if (err) {
+            console.log(err)
+            return
+          }
+          this.news = JSON.parse(res.text)
           this.total = this.news.length
-        },
-        error => {
-          console.log(error)
-        }
-      ).finally(() => {
-      })
-    }
+        })
+    },
+
   },
   data() {
     return {
       page: 1,
       total: 100,
       itemsPerPage: 10,
-      news: []
+      news: [],
     }
   },
   created() {
