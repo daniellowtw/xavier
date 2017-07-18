@@ -43,6 +43,43 @@ func (c *Client) GetActiveFeedSources() ([]*FeedSourceWithUnread, error) {
 	return ListAllFeeds(c.e)
 }
 
+func (c *Client) GetNewsItem(id int64) (*FeedItem, error) {
+	var i FeedItem
+	ok, err := c.e.Id(id).Get(&i)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, fmt.Errorf("get: not found")
+	}
+	return &i, nil
+}
+
+func (c *Client) GetProcessQueue() ([]*ProcessQueue, error) {
+	//func (c *Client) GetProcessQueue() ([]*FeedItem, error) {
+	var res []*ProcessQueue
+	if err := c.e.Find(&res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (c *Client) MarkAsProcessed(q *ProcessQueue, keywords []string) error {
+	if _, err := c.e.Insert(&DataPoint{NewsItemId: q.NewsItemId, Keywords: keywords}); err != nil {
+		return err
+	}
+	// Note: this is not atomic. TODO for future
+	if _, err := c.e.Delete(q); err != nil {
+		return err
+	}
+	return nil
+}
+
+// look through datapoints and find news feed that is not a point yet.
+func (c *Client) PopulateProcessQueue() error {
+	return populateUnprocessedNews(c.e)
+}
+
 func (c *Client) CheckWhetherSourceExist(url string) (bool, error) {
 	tablePlaceholder := new(FeedSource)
 	total, err := c.e.Where(fmt.Sprintf("url_source='%s'", url)).Count(tablePlaceholder)

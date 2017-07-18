@@ -8,9 +8,9 @@ import (
 
 	"github.com/daniellowtw/xavier/api"
 	"github.com/daniellowtw/xavier/db"
+	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 	"github.com/spf13/cobra"
-	"github.com/go-xorm/core"
 )
 
 var (
@@ -64,6 +64,20 @@ var (
 		},
 	}
 
+	LearnCmd = &cobra.Command{
+		Use: "learn",
+		RunE: func(*cobra.Command, []string) error {
+			return s.LearnFromNewNews()
+		},
+	}
+
+	AddNewToQueueCmd = &cobra.Command{
+		Use:"add-to-queue",
+		RunE: func(*cobra.Command, []string) error {
+			return db.NewClient(e).PopulateProcessQueue()
+		},
+	}
+
 	e *xorm.Engine
 	s *api.Service
 )
@@ -73,7 +87,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	if err := ee.CreateTables(&db.FeedSource{}, &db.FeedItem{}); err != nil {
+	if err := ee.CreateTables(&db.FeedSource{}, &db.FeedItem{}, &db.DataPoint{}, &db.ProcessQueue{}); err != nil {
 		panic(err)
 	}
 	e = ee

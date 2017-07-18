@@ -7,8 +7,8 @@ import (
 // TODO comments
 type FeedSourceWithUnread struct {
 	*FeedSource `xorm:"extends"`
-	UnreadCount            int64
-	TotalCount            int64
+	UnreadCount int64
+	TotalCount  int64
 }
 
 func (FeedSourceWithUnread) TableName() string {
@@ -25,3 +25,17 @@ func ListAllFeeds(engine *xorm.Engine) ([]*FeedSourceWithUnread, error) {
 	return fs, nil
 }
 
+func populateUnprocessedNews(engine *xorm.Engine) error {
+	var res []*FeedItem
+	err := engine.SQL(`select id, feed_id from feed_item as y where y.Id not in (select news_item_id from data_point) and y.Id not in (select news_item_id from process_queue)`).Find(&res)
+	if err != nil {
+		return err
+	}
+	var b []*ProcessQueue
+	for _, r := range res {
+		b = append(b, &ProcessQueue{FeedItemId: r.FeedId, NewsItemId: r.Id})
+	}
+	_, err1 := engine.Insert(b)
+	return err1
+
+}

@@ -8,6 +8,7 @@ import (
 type Service struct {
 	*NewsService
 	*FeedService
+	*learningService
 }
 
 func NewService(e *db.Client) *Service {
@@ -18,5 +19,9 @@ func NewService(e *db.Client) *Service {
 		FeedService: &FeedService{
 			dbClient: e,
 		},
+		learningService: &learningService{
+			dbClient: e,
+		},
+
 	}
 }
