@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"log"
+
 	"github.com/daniellowtw/xavier/client"
 	"github.com/daniellowtw/xavier/db"
 	"github.com/mmcdole/gofeed"
@@ -48,6 +50,9 @@ func (s *FeedService) AddFeed(url string) error {
 		FavIcon:     favIcon,
 	}
 	feedID, err := s.dbClient.AddFeed(item)
+	if err != nil {
+		return err
+	}
 	for _, i := range f.Items {
 		fixFeedItem(i)
 		err := s.dbClient.AddNews(feedID, db.ToFeedItem(item.Id, i))
@@ -55,27 +60,29 @@ func (s *FeedService) AddFeed(url string) error {
 			return err
 		}
 	}
+	log.Printf("Added %d items", len(f.Items))
 	return err
 }
 
 // check for update and then store news
-func (s *FeedService) updateFeedFromURL(f *db.FeedSource) error {
+func (s *FeedService) updateFeedFromURL(f *db.FeedSource) (int, error) {
 	fp := gofeed.NewParser()
 	fp.Client = client.New()
 	gf, err := fp.ParseURL(f.UrlSource)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	lastUpdated := f.LastChecked
 	var updatedItemCount int
 	for _, i := range gf.Items {
-		fixFeedItem(i)
 		if i.PublishedParsed != nil {
 			if i.PublishedParsed.Before(lastUpdated) {
+				log.Printf("Published before last updated %v", lastUpdated)
 				continue
 			}
 		} else if i.UpdatedParsed != nil {
 			if i.UpdatedParsed.Before(lastUpdated) {
+				log.Printf("Updated before last updated %v", lastUpdated)
 				continue
 			}
 		} else {
@@ -83,13 +90,14 @@ func (s *FeedService) updateFeedFromURL(f *db.FeedSource) error {
 		}
 		err := s.dbClient.AddNews(f.Id, db.ToFeedItem(f.Id, i))
 		if err != nil {
-			return err
+			return 0, err
 		}
+		updatedItemCount++
 	}
 	fmt.Printf("Updated db %d - %d items added.\n", f.Id, updatedItemCount)
 	f.LastChecked = time.Now()
 	s.dbClient.UpdateFeedSource(f)
-	return err
+	return updatedItemCount, err
 }
 
 func (s *FeedService) UpdateFeed(feedID int64) error {
@@ -97,7 +105,8 @@ func (s *FeedService) UpdateFeed(feedID int64) error {
 	if err != nil {
 		return fmt.Errorf("api: cannot get feed source: %v", err)
 	}
-	return s.updateFeedFromURL(f)
+	_, err = s.updateFeedFromURL(f)
+	return err
 }
 
 func (s *FeedService) DeleteFeed(id int64) error {
@@ -105,20 +114,22 @@ func (s *FeedService) DeleteFeed(id int64) error {
 	return nil
 }
 
-func (s *FeedService) UpdateAllFeeds() error {
+func (s *FeedService) UpdateAllFeeds() (int, error) {
 	fs, err := s.dbClient.GetActiveFeedSources()
 	if err != nil {
-		return err
+		return 0, err
 	}
+	total := 0
 	fmt.Printf("Found %d feeds to update\n", len(fs))
 	for _, f := range fs {
-		err := s.updateFeedFromURL(f.FeedSource)
+		n, err := s.updateFeedFromURL(f.FeedSource)
 		if err != nil {
-			return err
+			return 0, err
 		}
+		total += n
 		fmt.Printf("Updated db %s\n", f.Title)
 	}
-	return nil
+	return total, nil
 }
 
 func writeErr(w http.ResponseWriter, statusCode int, err error) {

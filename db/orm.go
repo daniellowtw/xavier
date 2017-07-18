@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+
 	"github.com/go-xorm/xorm"
 )
 
@@ -20,11 +21,11 @@ func (c *Client) UpdateFeedSource(f *FeedSource) error {
 
 func (c *Client) DeleteFeedSource(id int64) error {
 	var fs FeedSource
-	total, err := c.e.Id(id).Count(&fs)
+	found, err := c.e.Id(id).Get(&fs)
 	if err != nil {
 		return fmt.Errorf("db: %v", err)
 	}
-	if total == 0 {
+	if !found {
 		return fmt.Errorf("db: not found")
 	}
 	n, err := c.e.Where(fmt.Sprintf("feed_id = %d", id)).Delete(&FeedItem{})
@@ -32,7 +33,7 @@ func (c *Client) DeleteFeedSource(id int64) error {
 		return fmt.Errorf("cannot find all db items: %v", err)
 	}
 	fmt.Printf("Deleted %d items\n", n)
-	_, err = c.e.Delete(fs)
+	_, err = c.e.Delete(&fs)
 	if err != nil {
 		return fmt.Errorf("cannot delete db source: %v", err)
 	}
@@ -166,7 +167,6 @@ func (c *Client) MarkAsRead(newsID int64) error {
 }
 
 func (c *Client) SearchNews(filters ...filter) ([]*FeedItem, error) {
-	println("searching news")
 	var fs []*FeedItem
 	starting := c.e.NewSession()
 	for _, f := range filters {

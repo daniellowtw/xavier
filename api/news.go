@@ -15,7 +15,6 @@ type SearchParam struct {
 }
 
 func (s *NewsService) Search(param SearchParam) ([]*db.FeedItem, error) {
-	println("searching news")
 	if param.IncludeRead {
 		// search all if we want to find read as well
 		return s.dbClient.SearchNews()

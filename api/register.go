@@ -1,12 +1,12 @@
 package api
 
 import (
-	"github.com/gorilla/mux"
-	"strconv"
-	"fmt"
 	"encoding/json"
-	"github.com/davecgh/go-spew/spew"
+	"fmt"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 func Register(s *Service, group *mux.Router) {
@@ -19,10 +19,12 @@ func Register(s *Service, group *mux.Router) {
 		json.NewEncoder(w).Encode(things)
 	})
 	group.Methods(http.MethodPost).Path("/feeds").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if err := s.UpdateAllFeeds(); err != nil {
+		total, err := s.UpdateAllFeeds()
+		if err != nil {
 			writeErr(w, http.StatusInternalServerError, err)
 			return
 		}
+		w.Write([]byte(fmt.Sprintf("updated %d items", total)))
 	})
 	group.Methods(http.MethodDelete).Path("/feeds/{id}").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		feedID := mux.Vars(r)["id"]
@@ -75,12 +77,10 @@ func Register(s *Service, group *mux.Router) {
 			writeErr(w, http.StatusBadRequest, s.MarkAsRead(newsId))
 			return
 		default:
-			spew.Dump(action, r.Form)
 		}
 	})
 	group.Methods(http.MethodGet).Path("/news").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		things, err := s.Search(SearchParam{IncludeRead: false})
-		println("filtere")
 		if err != nil {
 			writeErr(w, http.StatusInternalServerError, err)
 			return
@@ -88,4 +88,3 @@ func Register(s *Service, group *mux.Router) {
 		json.NewEncoder(w).Encode(things)
 	})
 }
-

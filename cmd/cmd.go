@@ -32,9 +32,26 @@ var (
 	UpdateAllCmd = &cobra.Command{
 		Use: "update-all",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return s.UpdateAllFeeds()
+			_, err := s.UpdateAllFeeds()
+			return err
 		},
 	}
+
+	UpdateFeedCmd = &cobra.Command{
+		Use: "update <id>",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 1 {
+				return fmt.Errorf("Need one argument: <urL>")
+			}
+			u := args[0]
+			i, err := strconv.ParseInt(u, 10, 64)
+			if err != nil {
+				return err
+			}
+			return s.UpdateFeed(i)
+		},
+	}
+
 	ListAllCmd = &cobra.Command{
 		Use: "list",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -72,7 +89,7 @@ var (
 	}
 
 	AddNewToQueueCmd = &cobra.Command{
-		Use:"add-to-queue",
+		Use: "add-to-queue",
 		RunE: func(*cobra.Command, []string) error {
 			return db.NewClient(e).PopulateProcessQueue()
 		},

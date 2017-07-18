@@ -8,7 +8,7 @@
     <!-- Right side -->
     <div class="level-right">
       <p class="level-item">
-        <a class="button is-success" v-on:click="refreshFeed" :disabled="isLoading">Refresh</a>
+        <a class="button is-success" v-on:click.once="refreshFeed" :disabled="isLoading">Refresh</a>
       </p>
       <p class="level-item">
         <a class="button is-success">New</a>
@@ -37,9 +37,10 @@ export default Vue.component('feed-bar', {
           console.log(err)
           return
         }
-        swal('Updated feeds', 'Successfully polled items', 'success')
+        swal('Updated feeds', res.text, 'success')
       })
       this.isLoading = true
+      this.$emit('refresh-feed')
     }
   },
 })

@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <feed-bar></feed-bar>
+    <feed-bar @refresh-feed="loadFeeds"></feed-bar>
     <div class="columns">
       <div class="column is-12">
         <table class="table is-narrow is-bordered">
