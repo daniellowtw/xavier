@@ -2,9 +2,9 @@
   <section class="section">
     <news-bar></news-bar>
     <div class="columns">
-      <div class="column is-12">
-        <news-item v-for="newsItem in news" :key="newsItem.Id" :news="newsItem" :isDebug="isDebug" :fav="sources[newsItem.FeedId]" @read="markRead"></news-item>
-        <pagination :total="total" :page="page" :items-per-page="itemsPerPage" @change-page="onChangePage"></pagination>
+      <news-menu class="column is-3" @toggle-source="toggleSource" :sources="sources"></news-menu>
+      <div class="column is-9">
+        <news-item v-for="newsItem in news" :key="newsItem.Id" :news="newsItem" :isDebug="isDebug" :fav="favIcon[newsItem.FeedId]" @read="markRead"></news-item>
       </div>
     </div>
   </section>
@@ -12,17 +12,17 @@
 
 <script>
 var __API__ = '/api'
-import Pagination from './Pagination.vue'
 import NewsItem from './NewsItem.vue'
 import NewsBar from './NewsBar.vue'
+import NewsMenu from './NewsMenu.vue'
 import request from 'superagent'
 export default {
   props: ['isDebug', 'sources'],
   name: 'news',
   components: [
-    Pagination,
     NewsItem,
-    NewsBar
+    NewsBar,
+    NewsMenu
   ],
   methods: {
     onChangePage(page) {
@@ -46,22 +46,39 @@ export default {
             console.log(err)
             return
           }
-          this.news = JSON.parse(res.text)
+          this.allNews = JSON.parse(res.text)
+          this.news = this.allNews
           this.total = this.news.length
         })
     },
+    toggleSource(id) {
+      this.filteredSource = id
+    }
 
+  },
+  watch: {
+    filteredSource() {
+      this.news = this.allNews.filter(x => x.FeedId === this.filteredSource)
+    }
   },
   data() {
     return {
       page: 1,
       total: 100,
       itemsPerPage: 10,
+      allNews: [],
+      favIcon: {},
+      filteredSource: null,
       news: [],
     }
   },
   created() {
     this.loadNews()
   },
+  updated() {
+    this.sources.forEach(el => {
+      this.favIcon[el.Id] = el.FavIcon
+    }, this)
+  }
 }
 </script>

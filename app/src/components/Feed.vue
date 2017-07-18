@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <feed-bar @refresh-feed="loadFeeds"></feed-bar>
+    <feed-bar></feed-bar>
     <div class="columns">
       <div class="column is-12">
         <table class="table is-narrow is-bordered">
@@ -70,9 +70,6 @@ export default {
       total: 100,
       itemsPerPage: 10,
     }
-  },
-  created() {
-    this.loadFeeds()
   },
 }
 </script>

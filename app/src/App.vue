@@ -2,7 +2,7 @@
   <div id="app" class="container">
     <nav-bar :isDebug="isDebug" @change-mode="changeMode" @toggleDebug="toggleDebug"></nav-bar>
     <feed :isDebug="isDebug" :mode="mode" :feeds="sourcesList" v-show="mode == 'feed'"></feed>
-    <news :isDebug="isDebug" :mode="mode" :sources="sources" v-show="mode == 'news'"></news>
+    <news :isDebug="isDebug" :mode="mode" :sources="sourcesList" v-show="mode == 'news'"></news>
   </div>
 </template>
 
@@ -24,7 +24,6 @@ export default {
     return {
       mode: 'feed',
       isDebug: false,
-      sources: {},
       sourcesList: []
     }
   },
@@ -43,9 +42,6 @@ export default {
             return
           }
           this.sourcesList = JSON.parse(res.text)
-          this.sourcesList.forEach(el => {
-            this.sources[el.Id] = el.FavIcon
-          }, this)
         })
     }
   },
@@ -60,7 +56,5 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
 }
 </style>
