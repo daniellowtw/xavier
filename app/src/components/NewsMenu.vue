@@ -4,8 +4,8 @@
       Feeds
     </p>
     <ul class="menu-list">
-      <li v-for="source in sources" :key="source.Id">
-        <a class="has-shadow" v-on:click="toggleSource(source.Id)">{{source.Title}}
+      <li v-for="(source, index) in sources" :key="source.Id">
+        <a v-bind:class="{'primary':selectedSources[index] !== 0}" v-on:click="toggleSource(source, index)">{{source.Title}}
           <span class="icon">({{source.UnreadCount}})</span>
         </a>
       </li>
@@ -16,17 +16,22 @@
 <script>
 import Vue from 'vue'
 export default Vue.component('news-menu', {
-  props: ['isDebug', 'sources'],
+  props: ['isDebug', 'sources', 'selectedSources'],
   data() {
     return {
       isLoading: false,
     }
   },
   methods: {
-    toggleSource(id) {
-      console.log(id)
-      this.$emit('toggle-source', id)
+    toggleSource(source, index) {
+      this.$emit('toggle-source', source.Id, index)
     }
-  }
+  },
 })
 </script>
+<style>
+.primary {
+  color: #fff;
+  background: #00c4a7;
+}
+</style>

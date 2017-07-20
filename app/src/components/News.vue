@@ -1,8 +1,8 @@
 <template>
   <section class="section">
-    <news-bar></news-bar>
+    <news-bar :searchMode="searchMode" @changeMode="onChangeMode"></news-bar>
     <div class="columns">
-      <news-menu class="column is-3" @toggle-source="toggleSource" :sources="sources"></news-menu>
+      <news-menu class="column is-3" @toggle-source="toggleSource" :sources="sources" :selectedSources="selectedSources"></news-menu>
       <div class="column is-9">
         <news-item v-for="newsItem in news" :key="newsItem.Id" :news="newsItem" :isDebug="isDebug" :fav="favIcon[newsItem.FeedId]" :currentNewsId="currentNewsId" @read="markRead"></news-item>
       </div>
@@ -25,6 +25,10 @@ export default {
     NewsMenu
   ],
   methods: {
+    onChangeMode(mode) {
+      this.searchMode = mode
+      this.loadNews()
+    },
     onChangePage(page) {
       this.page = page
     },
@@ -44,25 +48,31 @@ export default {
         })
     },
     loadNews() {
-      request.get(`${__API__}/news`)
-        .end((err, res) => {
-          if (err) {
-            console.log(err)
-            return
-          }
-          this.allNews = JSON.parse(res.text)
-          this.news = this.allNews
-          this.total = this.news.length
-        })
+      let r = request.post(`${__API__}/news`)
+      r = r.send('limit=100')
+      if (this.searchMode === 'unread') {
+        r = r.send('search=unread')
+      }
+      r.end((err, res) => {
+        if (err) {
+          console.log(err)
+          return
+        }
+        this.allNews = JSON.parse(res.text)
+        this.news = this.allNews
+        this.total = this.news.length
+      })
     },
-    toggleSource(id) {
-      this.filteredSource = id
+    toggleSource(id, index) {
+      let newVal = (this.selectedSources[index] === 0) ? id : 0
+      this.selectedSources = this.selectedSources.slice(0, index).concat([newVal]).concat(this.selectedSources.slice(index + 1))
+      // TODO: Make this better
+      this.news = this.allNews.filter(x => this.selectedSources.indexOf(x.FeedId) !== -1)
     }
-
   },
   watch: {
-    filteredSource() {
-      this.news = this.allNews.filter(x => x.FeedId === this.filteredSource)
+    sources() {
+      this.selectedSources = (new Array(this.sources.length)).fill(0)
     }
   },
   data() {
@@ -72,9 +82,10 @@ export default {
       itemsPerPage: 10,
       allNews: [],
       favIcon: {},
-      filteredSource: null,
       news: [],
       currentNewsId: 0,
+      searchMode: 'all',
+      selectedSources: [],
     }
   },
   created() {

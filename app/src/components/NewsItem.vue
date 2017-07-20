@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <header class="card-header clickable">
-      <p class="card-header-title" v-on:click="toggleShow" v-bind:class="{read: (news.read)}">
+      <p class="card-header-title" v-on:click="toggleShow" v-bind:class="{read: (news.Read)}">
         <span class="icon">
           <i>
             <img v-bind:src="fav">

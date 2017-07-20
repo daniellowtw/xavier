@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/mux"
 	"github.com/daniellowtw/xavier/db"
+	"github.com/gorilla/mux"
 )
 
 func Register(s *Service, group *mux.Router) {
@@ -80,8 +80,24 @@ func Register(s *Service, group *mux.Router) {
 		default:
 		}
 	})
-	group.Methods(http.MethodGet).Path("/news").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		things, err := s.Search(SearchParam{IncludeRead: false})
+	group.Methods(http.MethodPost).Path("/news").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		limit := 0
+		inputLimit := r.Form.Get("limit")
+		if inputLimit != "" {
+			newLimit, err := strconv.ParseInt(inputLimit, 10, 32)
+			if err != nil {
+				writeErr(w, http.StatusBadRequest, err)
+				return
+			}
+			limit = int(newLimit)
+		}
+		searchMode := r.Form.Get("search")
+		includeRead := true
+		if searchMode == "unread" {
+			includeRead = false
+		}
+		things, err := s.Search(SearchParam{IncludeRead: includeRead, Limit: limit})
 		if err != nil {
 			writeErr(w, http.StatusInternalServerError, err)
 			return

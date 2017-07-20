@@ -12,14 +12,18 @@ type NewsService struct {
 type SearchParam struct {
 	// false for all
 	IncludeRead bool
+	Limit int
 }
 
 func (s *NewsService) Search(param SearchParam) ([]*db.FeedItem, error) {
-	if param.IncludeRead {
-		// search all if we want to find read as well
-		return s.dbClient.SearchNews()
+	var filters []db.Filter
+	if !param.IncludeRead {
+		filters = append(filters, db.FilterUnread())
 	}
-	return s.dbClient.SearchNews(db.FilterUnread())
+	if param.Limit != 0 {
+		filters = append(filters, db.FilterLimit(param.Limit))
+	}
+	return s.dbClient.SearchNews(filters...)
 }
 
 func (s *NewsService) ListAllNewsForFeed(feedID int64) ([]*db.FeedItem, error) {

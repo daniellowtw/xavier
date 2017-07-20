@@ -153,15 +153,20 @@ func (c *Client) GetFeedItems(id string) (res []*FeedItem, err error) {
 	return
 }
 
-type filter func(s *xorm.Session) *xorm.Session
+type Filter func(s *xorm.Session) *xorm.Session
 
-func FilterUnread() filter {
+func FilterUnread() Filter {
 	return func(s *xorm.Session) *xorm.Session {
 		return s.Where("read = 0")
 	}
 }
+func FilterLimit(n int) Filter {
+	return func(s *xorm.Session) *xorm.Session {
+		return s.Limit(n)
+	}
+}
 
-func FilterFeedID(id int64) filter {
+func FilterFeedID(id int64) Filter {
 	return func(s *xorm.Session) *xorm.Session {
 		return s.Where(fmt.Sprintf("feed_id = %d", id))
 	}
@@ -183,7 +188,7 @@ func (c *Client) MarkAsRead(newsID int64) error {
 	return nil
 }
 
-func (c *Client) SearchNews(filters ...filter) ([]*FeedItem, error) {
+func (c *Client) SearchNews(filters ...Filter) ([]*FeedItem, error) {
 	var fs []*FeedItem
 	starting := c.e.NewSession()
 	for _, f := range filters {
