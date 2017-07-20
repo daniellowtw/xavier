@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <header class="card-header clickable">
-      <p class="card-header-title" v-on:click="toggleShow" v-bind:class="{read: (news.read===true)}">
+      <p class="card-header-title" v-on:click="toggleShow" v-bind:class="{read: (news.read)}">
         <span class="icon">
           <i>
             <img v-bind:src="fav">
@@ -24,28 +24,51 @@
       </div>
     </div>
     <footer class="card-footer" v-show="show">
+      <a class="card-footer-item" v-on:click="classify(-1)" v-bind:class="{'is-primary': (this.classification === -1)}">Don't like it</a>
       <a class="card-footer-item">Save</a>
-      <a class="card-footer-item">Edit</a>
-      <a class="card-footer-item">Delete</a>
+      <a class="card-footer-item" v-on:click="classify(1)" v-bind:class="{'is-primary': (this.classification === 1)}">Like it</a>
     </footer>
   </div>
 </template>
 <script>
 import Vue from 'vue'
+import request from 'superagent'
+var __API__ = '/api'
 export default Vue.component('news-item', {
-  props: ['news', 'isDebug', 'fav'],
+  props: ['news', 'isDebug', 'fav', 'currentNewsId'],
   data() {
     return {
       show: false,
       content: '',
+      classification: 0,
     }
   },
   methods: {
     toggleShow() {
-      this.$emit('read', this.news)
       this.show = !this.show
+      this.$emit('read', this.news)
     },
+    classify(v) {
+      request.post(`${__API__}/learn`)
+        .send(`news_id=${this.news.Id}`) // sending string automatically makes it form URL encoded
+        .send(`classification=${v}`) // sending string automatically makes it form URL encoded
+        .end((err, res) => {
+          if (err) {
+            console.log(err)
+            return
+          }
+          this.classification = v
+        }) // sending string automatically makes it form URL encoded
+    }
   },
+  watch: {
+    currentNewsId(v) {
+      console.log(v)
+      if (this.news.Id !== v) {
+        this.show = false
+      }
+    }
+  }
 })
 </script>
 <style>
@@ -55,5 +78,10 @@ export default Vue.component('news-item', {
 
 .read {
   font-size: small;
+}
+
+.is-primary {
+  color: #fff;
+  background-color: #00d1b2;
 }
 </style>

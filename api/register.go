@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/daniellowtw/xavier/db"
 )
 
 func Register(s *Service, group *mux.Router) {
@@ -86,5 +87,28 @@ func Register(s *Service, group *mux.Router) {
 			return
 		}
 		json.NewEncoder(w).Encode(things)
+	})
+	group.Methods(http.MethodPost).Path("/learn").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		newsIDString := r.Form.Get("news_id")
+		classification := r.Form.Get("classification")
+		if newsIDString == "" || classification == "" {
+			writeErr(w, http.StatusBadRequest, fmt.Errorf("missing news id or classification"))
+			return
+		}
+		newsId, err := strconv.ParseInt(newsIDString, 10, 64)
+		if err != nil {
+			writeErr(w, http.StatusBadRequest, err)
+			return
+		}
+		switch classification {
+		case "1":
+			s.HumanClassification(newsId, db.POSITIVE)
+		case "-1":
+			s.HumanClassification(newsId, db.NEGATIVE)
+		default:
+			writeErr(w, http.StatusBadRequest, fmt.Errorf("can't prase classification"))
+		}
+		return
 	})
 }

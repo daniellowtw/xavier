@@ -56,6 +56,23 @@ func (c *Client) GetNewsItem(id int64) (*FeedItem, error) {
 	return &i, nil
 }
 
+func (c *Client) GetDataPoint(newsID int64) (*DataPoint, error) {
+	var res *DataPoint
+	ok, err := c.e.Where(fmt.Sprintf("news_id = %d", newsID)).Get(&res)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, fmt.Errorf("get: not found")
+	}
+	return res, nil
+}
+
+func (c *Client) SaveDataPoint(point *DataPoint) error {
+	_, err := c.e.Update(point)
+	return err
+}
+
 func (c *Client) GetProcessQueue() ([]*ProcessQueue, error) {
 	//func (c *Client) GetProcessQueue() ([]*FeedItem, error) {
 	var res []*ProcessQueue

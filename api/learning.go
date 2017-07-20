@@ -44,3 +44,12 @@ func (s *learningService) LearnFromNewNews() error {
 	}
 	return nil
 }
+
+func (s *learningService) HumanClassification(newsID int64, outcome db.UserClassification) error {
+	d, err := s.dbClient.GetDataPoint(newsID)
+	if err != nil {
+		return err
+	}
+	d.Outcome = outcome
+	return s.dbClient.SaveDataPoint(d)
+}

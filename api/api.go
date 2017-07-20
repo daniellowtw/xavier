@@ -22,6 +22,5 @@ func NewService(e *db.Client) *Service {
 		learningService: &learningService{
 			dbClient: e,
 		},
-
 	}
 }

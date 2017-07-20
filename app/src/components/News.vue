@@ -4,7 +4,7 @@
     <div class="columns">
       <news-menu class="column is-3" @toggle-source="toggleSource" :sources="sources"></news-menu>
       <div class="column is-9">
-        <news-item v-for="newsItem in news" :key="newsItem.Id" :news="newsItem" :isDebug="isDebug" :fav="favIcon[newsItem.FeedId]" @read="markRead"></news-item>
+        <news-item v-for="newsItem in news" :key="newsItem.Id" :news="newsItem" :isDebug="isDebug" :fav="favIcon[newsItem.FeedId]" :currentNewsId="currentNewsId" @read="markRead"></news-item>
       </div>
     </div>
   </section>
@@ -29,6 +29,9 @@ export default {
       this.page = page
     },
     markRead(news) {
+      if (news.read) {
+        this.currentNewsId = news.Id
+      }
       request.post(`${__API__}/feeds/${news.FeedId}/news/${news.Id}`)
         .send('action=read') // sending string automatically makes it form URL encoded
         .end((err, res) => {
@@ -37,6 +40,7 @@ export default {
             return
           }
           news.read = true
+          this.currentNewsId = news.Id
         })
     },
     loadNews() {
@@ -70,6 +74,7 @@ export default {
       favIcon: {},
       filteredSource: null,
       news: [],
+      currentNewsId: 0,
     }
   },
   created() {
