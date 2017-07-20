@@ -7,6 +7,8 @@ import (
 
 	"log"
 
+	"encoding/json"
+
 	"github.com/daniellowtw/xavier/client"
 	"github.com/daniellowtw/xavier/db"
 	"github.com/mmcdole/gofeed"
@@ -88,6 +90,7 @@ func (s *FeedService) updateFeedFromURL(f *db.FeedSource) (int, error) {
 		} else {
 			fmt.Println("Cannot parsed published time nor updated time. Feed will most likely have duplicated items.")
 		}
+		fixFeedItem(i)
 		err := s.dbClient.AddNews(f.Id, db.ToFeedItem(f.Id, i))
 		if err != nil {
 			return 0, err
@@ -112,6 +115,24 @@ func (s *FeedService) UpdateFeed(feedID int64) error {
 func (s *FeedService) DeleteFeed(id int64) error {
 	s.dbClient.DeleteFeedSource(id)
 	return nil
+}
+
+func (s *FeedService) DebugFeed(id int64) ([]byte, error) {
+	f, err := s.dbClient.GetFeedSource(id)
+	if err != nil {
+		return nil, err
+	}
+
+	fp := gofeed.NewParser()
+	fp.Client = client.New()
+	gf, err := fp.ParseURL(f.UrlSource)
+	if err != nil {
+		return nil, err
+	}
+	for _, i := range gf.Items {
+		fixFeedItem(i)
+	}
+	return json.MarshalIndent(gf, "", "\t")
 }
 
 func (s *FeedService) UpdateAllFeeds() (int, error) {

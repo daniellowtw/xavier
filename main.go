@@ -22,6 +22,7 @@ func main() {
 	rootCmd.AddCommand(verCmd)
 	rootCmd.AddCommand(cmd.AddCmd,
 		cmd.UpdateAllCmd,
+		cmd.DebugCmd,
 		cmd.UpdateFeedCmd,
 		cmd.ListAllCmd,
 		cmd.DeleteCmd,
