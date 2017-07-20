@@ -79,12 +79,10 @@ func (s *FeedService) updateFeedFromURL(f *db.FeedSource) (int, error) {
 	for _, i := range gf.Items {
 		if i.PublishedParsed != nil {
 			if i.PublishedParsed.Before(lastUpdated) {
-				log.Printf("Published before last updated %v", lastUpdated)
 				continue
 			}
 		} else if i.UpdatedParsed != nil {
 			if i.UpdatedParsed.Before(lastUpdated) {
-				log.Printf("Updated before last updated %v", lastUpdated)
 				continue
 			}
 		} else {
