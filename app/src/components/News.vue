@@ -2,7 +2,7 @@
   <section class="section">
     <news-bar :searchMode="searchMode" @changeMode="onChangeMode"></news-bar>
     <div class="columns">
-      <news-menu class="column is-3" @toggle-source="toggleSource" :sources="sources" :selectedSources="selectedSources"></news-menu>
+      <news-menu class="column is-3" @toggle-source="chooseNewsSource" :sources="sources" :selectedSources="selectedSources"></news-menu>
       <div class="column is-9">
         <news-item v-for="newsItem in news" :key="newsItem.Id" :news="newsItem" :isDebug="isDebug" :fav="favIcon[newsItem.FeedId]" :currentNewsId="currentNewsId" @read="markRead"></news-item>
       </div>
@@ -33,8 +33,10 @@ export default {
       this.page = page
     },
     markRead(news) {
-      if (news.read) {
+      if (news.Read) {
         this.currentNewsId = news.Id
+      } else {
+        this.sources.filter(x => x.Id === news.FeedId)[0].UnreadCount--
       }
       request.post(`${__API__}/feeds/${news.FeedId}/news/${news.Id}`)
         .send('action=read') // sending string automatically makes it form URL encoded
@@ -43,7 +45,7 @@ export default {
             console.log(err)
             return
           }
-          news.read = true
+          news.Read = true
           this.currentNewsId = news.Id
         })
     },
@@ -67,13 +69,18 @@ export default {
         this.total = this.news.length
       })
     },
+    // TODO: Dead code
     toggleSource(id, index) {
       let newVal = (this.selectedSources[index] === 0) ? id : 0
       this.selectedSources = this.selectedSources.slice(0, index).concat([newVal]).concat(this.selectedSources.slice(index + 1))
-      // TODO: Make this better
-      // this.news = this.allNews.filter(x => this.selectedSources.indexOf(x.FeedId) !== -1)
+      this.loadNews()
+    },
+    chooseNewsSource(id, index) {
+      this.selectedSources = (new Array(this.sources.length)).fill(0)
+      this.selectedSources[index] = id
       this.loadNews()
     }
+
   },
   watch: {
     sources() {
@@ -89,7 +96,7 @@ export default {
       favIcon: {},
       news: [],
       currentNewsId: 0,
-      searchMode: 'all',
+      searchMode: 'unread',
       selectedSources: [],
     }
   },

@@ -7,6 +7,8 @@
             <img v-bind:src="fav">
           </i>
         </span> {{news.Title}}
+        <span class="entry-separator">•</span>
+        <a v-bind:href="news.LinkHref" class="sub"> {{news.Published}}</a>
       </p>
       <a class="card-header-icon">
         <span class="icon">
@@ -83,5 +85,17 @@ export default Vue.component('news-item', {
 .is-primary {
   color: #fff;
   background-color: #00d1b2;
+}
+
+.sub {
+  display: inline;
+  color: #aaa;
+  align-self: center;
+  font-size: 0.7em;
+}
+
+.entry-separator {
+  margin-right: 5px;
+  margin-left: 5px
 }
 </style>

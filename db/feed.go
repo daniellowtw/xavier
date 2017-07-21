@@ -47,6 +47,10 @@ func ToFeedItem(feedID int64, i *gofeed.Item) *FeedItem {
 	if i.Author != nil {
 		author = i.Author.Name
 	}
+	timeToUse := i.PublishedParsed
+	if i.PublishedParsed == nil {
+		timeToUse = i.UpdatedParsed
+	}
 	return &FeedItem{
 		FeedId:      feedID,
 		Title:       i.Title,
@@ -55,7 +59,7 @@ func ToFeedItem(feedID int64, i *gofeed.Item) *FeedItem {
 		Description: i.Description,
 		Content:     i.Content,
 		LinkHref:    i.Link,
-		Published:   i.PublishedParsed,
+		Published:   timeToUse,
 		Guid:        i.GUID,
 		Enclosure:   string(encl),
 		Custom:      i.Custom,
