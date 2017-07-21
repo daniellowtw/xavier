@@ -13,6 +13,7 @@ type SearchParam struct {
 	// false for all
 	IncludeRead bool
 	Limit int
+	FeedIDs []int64
 }
 
 func (s *NewsService) Search(param SearchParam) ([]*db.FeedItem, error) {
@@ -22,6 +23,9 @@ func (s *NewsService) Search(param SearchParam) ([]*db.FeedItem, error) {
 	}
 	if param.Limit != 0 {
 		filters = append(filters, db.FilterLimit(param.Limit))
+	}
+	if len(param.FeedIDs) != 0 {
+		filters = append(filters, db.FilterFeedIds(param.FeedIDs))
 	}
 	return s.dbClient.SearchNews(filters...)
 }

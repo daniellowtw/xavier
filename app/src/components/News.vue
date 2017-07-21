@@ -48,10 +48,14 @@ export default {
         })
     },
     loadNews() {
+      let selectedIds = this.selectedSources.filter(x => x !== 0)
       let r = request.post(`${__API__}/news`)
       r = r.send('limit=100')
       if (this.searchMode === 'unread') {
         r = r.send('search=unread')
+      }
+      if (selectedIds.length !== 0) {
+        r = r.send(`ids=${selectedIds.join(',')}`)
       }
       r.end((err, res) => {
         if (err) {
@@ -67,7 +71,8 @@ export default {
       let newVal = (this.selectedSources[index] === 0) ? id : 0
       this.selectedSources = this.selectedSources.slice(0, index).concat([newVal]).concat(this.selectedSources.slice(index + 1))
       // TODO: Make this better
-      this.news = this.allNews.filter(x => this.selectedSources.indexOf(x.FeedId) !== -1)
+      // this.news = this.allNews.filter(x => this.selectedSources.indexOf(x.FeedId) !== -1)
+      this.loadNews()
     }
   },
   watch: {

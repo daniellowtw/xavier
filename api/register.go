@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"strings"
+
 	"github.com/daniellowtw/xavier/db"
 	"github.com/gorilla/mux"
 )
@@ -97,7 +99,18 @@ func Register(s *Service, group *mux.Router) {
 		if searchMode == "unread" {
 			includeRead = false
 		}
-		things, err := s.Search(SearchParam{IncludeRead: includeRead, Limit: limit})
+		var searchIds []int64
+		feedIDs := r.Form.Get("ids")
+		if feedIDs != "" {
+			for _, i := range strings.Split(feedIDs, ",") {
+				ii, err := strconv.ParseInt(i, 10, 64)
+				if err != nil {
+					continue
+				}
+				searchIds = append(searchIds, ii)
+			}
+		}
+		things, err := s.Search(SearchParam{IncludeRead: includeRead, Limit: limit, FeedIDs: searchIds})
 		if err != nil {
 			writeErr(w, http.StatusInternalServerError, err)
 			return

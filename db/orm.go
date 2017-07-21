@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/go-xorm/xorm"
+	"strings"
+	"strconv"
 )
 
 type Client struct {
@@ -163,6 +165,16 @@ func FilterUnread() Filter {
 func FilterLimit(n int) Filter {
 	return func(s *xorm.Session) *xorm.Session {
 		return s.Limit(n)
+	}
+}
+
+func FilterFeedIds(feedIDs []int64) Filter {
+	return func(s *xorm.Session) *xorm.Session {
+		var final []string
+		for _, i := range feedIDs {
+			final = append(final, strconv.FormatInt(i, 10))
+		}
+		return s.Where(fmt.Sprintf("feed_id in (%v)", strings.Join(final, ",")))
 	}
 }
 
