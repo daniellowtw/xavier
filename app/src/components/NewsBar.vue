@@ -25,8 +25,12 @@
 
 <script>
 import Vue from 'vue'
+import { mapState } from 'vuex'
 export default Vue.component('news-bar', {
-  props: ['isDebug', 'searchMode'],
+  props: ['searchMode'],
+  computed: mapState({
+    isDebug: 'isDebug'
+  }),
   data() {
     return {
       isLoading: false

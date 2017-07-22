@@ -40,7 +40,6 @@ export default Vue.component('feed-bar', {
         swal('Updated feeds', res.text, 'success')
       })
       this.isLoading = true
-      this.$emit('refresh-feed')
     }
   },
 })

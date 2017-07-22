@@ -13,7 +13,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="feed in feeds" :key="feed.Id">
+            <tr v-for="feed in sources" :key="feed.Id">
               <td>
                 <span class="icon">
                   <i>
@@ -52,8 +52,12 @@
 <script>
 import Pagination from './Pagination.vue'
 import FeedBar from './FeedBar.vue'
+import { mapState } from 'vuex'
 export default {
-  props: ['isDebug', 'feeds'],
+  computed: mapState({
+    isDebug: 'isDebug',
+    sources: 'sources'
+  }),
   name: 'feed',
   components: [
     Pagination,

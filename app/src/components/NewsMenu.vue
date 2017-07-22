@@ -15,13 +15,17 @@
 
 <script>
 import Vue from 'vue'
+import { mapState } from 'vuex'
 export default Vue.component('news-menu', {
-  props: ['isDebug', 'sources', 'selectedSources'],
+  props: ['isDebug', 'selectedSources'],
   data() {
     return {
       isLoading: false,
     }
   },
+  computed: mapState({
+    sources: 'sources'
+  }),
   methods: {
     toggleSource(source, index) {
       this.$emit('toggle-source', source.Id, index)

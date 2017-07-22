@@ -2,9 +2,9 @@
   <section class="section">
     <news-bar :searchMode="searchMode" @changeMode="onChangeMode"></news-bar>
     <div class="columns">
-      <news-menu class="column is-3" @toggle-source="chooseNewsSource" :sources="sources" :selectedSources="selectedSources"></news-menu>
+      <news-menu class="column is-3" @toggle-source="chooseNewsSource" :selectedSources="selectedSources"></news-menu>
       <div class="column is-9">
-        <news-item v-for="newsItem in news" :key="newsItem.Id" :news="newsItem" :isDebug="isDebug" :fav="favIcon[newsItem.FeedId]" :currentNewsId="currentNewsId" @read="markRead"></news-item>
+        <news-item v-for="newsItem in news" :key="newsItem.Id" :news="newsItem" :currentNewsId="currentNewsId" @read="markRead"></news-item>
       </div>
     </div>
   </section>
@@ -16,14 +16,18 @@ import NewsItem from './NewsItem.vue'
 import NewsBar from './NewsBar.vue'
 import NewsMenu from './NewsMenu.vue'
 import request from 'superagent'
+import { mapState } from 'vuex'
+
 export default {
-  props: ['isDebug', 'sources'],
   name: 'news',
   components: [
     NewsItem,
     NewsBar,
     NewsMenu
   ],
+  computed: mapState({
+    sources: 'sources',
+  }),
   methods: {
     onChangeMode(mode) {
       this.searchMode = mode
@@ -36,7 +40,8 @@ export default {
       if (news.Read) {
         this.currentNewsId = news.Id
       } else {
-        this.sources.filter(x => x.Id === news.FeedId)[0].UnreadCount--
+        this.$store.commit('readNews', news.FeedId)
+        // this.sources.filter(x => x.Id === news.FeedId)[0].UnreadCount--
       }
       request.post(`${__API__}/feeds/${news.FeedId}/news/${news.Id}`)
         .send('action=read') // sending string automatically makes it form URL encoded
@@ -64,9 +69,7 @@ export default {
           console.log(err)
           return
         }
-        this.allNews = JSON.parse(res.text)
-        this.news = this.allNews
-        this.total = this.news.length
+        this.news = JSON.parse(res.text)
       })
     },
     // TODO: Dead code
@@ -89,11 +92,6 @@ export default {
   },
   data() {
     return {
-      page: 1,
-      total: 100,
-      itemsPerPage: 10,
-      allNews: [],
-      favIcon: {},
       news: [],
       currentNewsId: 0,
       searchMode: 'unread',
@@ -103,10 +101,5 @@ export default {
   created() {
     this.loadNews()
   },
-  updated() {
-    this.sources.forEach(el => {
-      this.favIcon[el.Id] = el.FavIcon
-    }, this)
-  }
 }
 </script>

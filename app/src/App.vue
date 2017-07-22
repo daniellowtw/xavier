@@ -1,8 +1,8 @@
 <template>
   <div id="app" class="container">
-    <nav-bar :isDebug="isDebug" @change-mode="changeMode" @toggleDebug="toggleDebug"></nav-bar>
-    <feed :isDebug="isDebug" :mode="mode" :feeds="sourcesList" v-show="mode == 'feed'"></feed>
-    <news :isDebug="isDebug" :mode="mode" :sources="sourcesList" v-show="mode == 'news'"></news>
+    <nav-bar @change-mode="changeMode"></nav-bar>
+    <feed :mode="mode" v-show="mode == 'feed'"></feed>
+    <news :mode="mode" v-show="mode == 'news'"></news>
   </div>
 </template>
 
@@ -11,6 +11,7 @@ import Feed from './components/Feed'
 import News from './components/News'
 import NavBar from './components/NavBar'
 import request from 'superagent'
+import { mapState } from 'vuex'
 var __API__ = '/api'
 
 export default {
@@ -20,19 +21,17 @@ export default {
     NavBar,
     News
   },
+  computed: mapState({
+    sourcesList: 'sourcesList',
+  }),
   data() {
     return {
-      mode: 'feed',
-      isDebug: false,
-      sourcesList: []
+      mode: 'feed'
     }
   },
   methods: {
     changeMode(mode) {
       this.mode = mode
-    },
-    toggleDebug(mode) {
-      this.isDebug = !this.isDebug
     },
     loadSources() {
       request.get(`${__API__}/feeds`)
@@ -41,7 +40,7 @@ export default {
             console.log(err)
             return
           }
-          this.sourcesList = JSON.parse(res.text)
+          this.$store.commit('updateSources', JSON.parse(res.text))
         })
     }
   },

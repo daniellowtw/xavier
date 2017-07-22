@@ -19,7 +19,7 @@ export default {
       this.$emit('change-mode', mode)
     },
     toggleDebug() {
-      this.$emit('toggleDebug')
+      this.$store.commit('toggleDebug')
     }
   },
 }

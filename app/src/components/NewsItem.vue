@@ -4,7 +4,7 @@
       <p class="card-header-title" v-on:click="toggleShow" v-bind:class="{read: (news.Read)}">
         <span class="icon">
           <i>
-            <img v-bind:src="fav">
+            <img v-bind:src="favIcon">
           </i>
         </span> {{news.Title}}
         <span class="entry-separator">•</span>
@@ -35,9 +35,17 @@
 <script>
 import Vue from 'vue'
 import request from 'superagent'
+import { mapState } from 'vuex'
 var __API__ = '/api'
 export default Vue.component('news-item', {
-  props: ['news', 'isDebug', 'fav', 'currentNewsId'],
+  props: ['news', 'currentNewsId'],
+  computed: {
+    favIcon() { let t = this.sources.find(x => x.Id === this.news.FeedId); return t === undefined ? '' : t.FavIcon },
+    ...mapState({
+      isDebug: 'isDebug',
+      sources: 'sources',
+    }),
+  },
   data() {
     return {
       show: false,
@@ -65,7 +73,6 @@ export default Vue.component('news-item', {
   },
   watch: {
     currentNewsId(v) {
-      console.log(v)
       if (this.news.Id !== v) {
         this.show = false
       }
