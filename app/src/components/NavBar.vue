@@ -11,12 +11,16 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
-  props: ['mode', 'isDebug'],
+  computed: mapState({
+    isDebug: 'isDebug',
+    mode: 'mode',
+  }),
   name: 'nav-bar',
   methods: {
     changeMode: function (mode) {
-      this.$emit('change-mode', mode)
+      this.$store.commit('changeMode', mode)
     },
     toggleDebug() {
       this.$store.commit('toggleDebug')

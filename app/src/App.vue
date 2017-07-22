@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="container">
-    <nav-bar @change-mode="changeMode"></nav-bar>
+    <nav-bar></nav-bar>
     <feed :mode="mode" v-show="mode == 'feed'"></feed>
     <news :mode="mode" v-show="mode == 'news'"></news>
   </div>
@@ -10,23 +10,17 @@
 import Feed from './components/Feed'
 import News from './components/News'
 import NavBar from './components/NavBar'
+import { mapState } from 'vuex'
 
 export default {
   name: 'app',
+  computed: mapState({
+    mode: 'mode'
+  }),
   components: {
     Feed,
     NavBar,
     News
-  },
-  data() {
-    return {
-      mode: 'feed'
-    }
-  },
-  methods: {
-    changeMode(mode) {
-      this.mode = mode
-    },
   },
   created() {
     this.$store.dispatch('loadSources')

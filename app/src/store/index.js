@@ -8,8 +8,10 @@ const debug = process.env.NODE_ENV !== 'production'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
+  // initial state
   state: {
     isDebug: false,
+    mode: 'feed',
     sources: [],
     news: [],
     currentNewsId: 0,
@@ -50,6 +52,9 @@ export default new Vuex.Store({
     // TODO: think of a better way for alerting.
     notify(state, { title, body, type }) {
       swal(title, body, type)
+    },
+    changeMode(state, mode) {
+      state.mode = mode
     }
   },
   actions: {
