@@ -26,49 +26,42 @@
       </div>
     </div>
     <footer class="card-footer" v-show="show">
-      <a class="card-footer-item" v-on:click="classify(-1)" v-bind:class="{'is-primary': (this.classification === -1)}">Don't like it</a>
+      <a class="card-footer-item" v-on:click="classify(-1)" v-bind:class="{'is-primary': (this.currentNewsClassification === -1)}">Don't like it</a>
       <a class="card-footer-item">Save</a>
-      <a class="card-footer-item" v-on:click="classify(1)" v-bind:class="{'is-primary': (this.classification === 1)}">Like it</a>
+      <a class="card-footer-item" v-on:click="classify(1)" v-bind:class="{'is-primary': (this.currentNewsClassification === 1)}">Like it</a>
     </footer>
   </div>
 </template>
 <script>
 import Vue from 'vue'
-import request from 'superagent'
 import { mapState } from 'vuex'
-var __API__ = '/api'
 export default Vue.component('news-item', {
-  props: ['news', 'currentNewsId'],
+  props: ['news'],
   computed: {
     favIcon() { let t = this.sources.find(x => x.Id === this.news.FeedId); return t === undefined ? '' : t.FavIcon },
     ...mapState({
       isDebug: 'isDebug',
       sources: 'sources',
+      currentNewsId: 'currentNewsId',
+      currentNewsClassification: 'currentNewsClassification',
     }),
   },
   data() {
     return {
       show: false,
       content: '',
-      classification: 0,
     }
   },
   methods: {
     toggleShow() {
       this.show = !this.show
-      this.$emit('read', this.news)
+      this.markRead()
+    },
+    markRead() {
+      this.$store.dispatch('markRead', { newsId: this.news.Id, feedId: this.news.FeedId })
     },
     classify(v) {
-      request.post(`${__API__}/learn`)
-        .send(`news_id=${this.news.Id}`) // sending string automatically makes it form URL encoded
-        .send(`classification=${v}`) // sending string automatically makes it form URL encoded
-        .end((err, res) => {
-          if (err) {
-            console.log(err)
-            return
-          }
-          this.classification = v
-        }) // sending string automatically makes it form URL encoded
+      this.$store.dispatch('classify', { newsId: this.news.Id, feedId: this.news.FeedId, classification: v })
     }
   },
   watch: {
@@ -76,7 +69,7 @@ export default Vue.component('news-item', {
       if (this.news.Id !== v) {
         this.show = false
       }
-    }
+    },
   }
 })
 </script>

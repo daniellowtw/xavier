@@ -8,7 +8,7 @@
     <!-- Right side -->
     <div class="level-right">
       <p class="level-item">
-        <a class="button is-success" v-on:click.once="refreshFeed" :disabled="isLoading">Refresh</a>
+        <a class="button is-success" v-on:click.once="refreshFeed">Refresh</a>
       </p>
       <p class="level-item">
         <a class="button is-success">New</a>
@@ -18,28 +18,11 @@
 </template>
 
 <script>
-var __API__ = '/api/feeds'
-import request from 'superagent'
-import swal from 'sweetalert2'
 import Vue from 'vue'
 export default Vue.component('feed-bar', {
-  data() {
-    return {
-      isLoading: false
-    }
-  },
   methods: {
     refreshFeed() {
-      if (this.isLoading) return
-      request.post(__API__).end((err, res) => {
-        this.isLoading = false
-        if (err) {
-          console.log(err)
-          return
-        }
-        swal('Updated feeds', res.text, 'success')
-      })
-      this.isLoading = true
+      this.$store.dispatch('refreshFeed')
     }
   },
 })

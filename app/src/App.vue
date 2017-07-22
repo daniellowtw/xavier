@@ -10,9 +10,6 @@
 import Feed from './components/Feed'
 import News from './components/News'
 import NavBar from './components/NavBar'
-import request from 'superagent'
-import { mapState } from 'vuex'
-var __API__ = '/api'
 
 export default {
   name: 'app',
@@ -21,9 +18,6 @@ export default {
     NavBar,
     News
   },
-  computed: mapState({
-    sourcesList: 'sourcesList',
-  }),
   data() {
     return {
       mode: 'feed'
@@ -33,19 +27,9 @@ export default {
     changeMode(mode) {
       this.mode = mode
     },
-    loadSources() {
-      request.get(`${__API__}/feeds`)
-        .end((err, res) => {
-          if (err) {
-            console.log(err)
-            return
-          }
-          this.$store.commit('updateSources', JSON.parse(res.text))
-        })
-    }
   },
   created() {
-    this.loadSources()
+    this.$store.dispatch('loadSources')
   }
 }
 </script>
