@@ -6,20 +6,25 @@ import (
 
 // NewsService is implements the API
 type NewsService struct {
-	dbClient    *db.Client
+	dbClient *db.Client
 }
 
 type SearchParam struct {
 	// false for all
-	IncludeRead bool
-	Limit int
-	FeedIDs []int64
+	SearchMode string
+	Limit      int
+	FeedIDs    []int64
 }
 
-func (s *NewsService) Search(param SearchParam) ([]*db.FeedItem, error) {
+func (s *NewsService) Search(param SearchParam) ([]*db.ExtendedFeedItem, error) {
 	var filters []db.Filter
-	if !param.IncludeRead {
+	switch param.SearchMode {
+	case "all":
+	case "unread":
 		filters = append(filters, db.FilterUnread())
+	case "saved":
+		filters = append(filters, db.FilterSaved())
+	default:
 	}
 	if param.Limit != 0 {
 		filters = append(filters, db.FilterLimit(param.Limit))
@@ -30,10 +35,14 @@ func (s *NewsService) Search(param SearchParam) ([]*db.FeedItem, error) {
 	return s.dbClient.SearchNews(filters...)
 }
 
-func (s *NewsService) ListAllNewsForFeed(feedID int64) ([]*db.FeedItem, error) {
+func (s *NewsService) ListAllNewsForFeed(feedID int64) ([]*db.ExtendedFeedItem, error) {
 	return s.dbClient.SearchNews(db.FilterFeedID(feedID))
 }
 
 func (s *NewsService) MarkAsRead(newsID int64) error {
 	return s.dbClient.MarkAsRead(newsID)
+}
+
+func (s *NewsService) ToggleNews(newsID int64, feedID int64) (bool, error) {
+	return s.dbClient.ToggleSave(newsID, feedID)
 }

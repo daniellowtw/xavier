@@ -104,7 +104,13 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	if err := ee.CreateTables(&db.FeedSource{}, &db.FeedItem{}, &db.DataPoint{}, &db.ProcessQueue{}); err != nil {
+	if err := ee.CreateTables(
+		&db.FeedSource{},
+		&db.FeedItem{},
+		&db.DataPoint{},
+		&db.ProcessQueue{},
+		&db.SavedItem{},
+	); err != nil {
 		panic(err)
 	}
 	e = ee

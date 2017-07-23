@@ -15,10 +15,7 @@ export default {
   loadNews({ selectedSources, searchMode }, errCb, successCb) {
     let selectedIds = selectedSources.filter(x => x !== 0)
     let r = request.post(`${__API__}/news`)
-    r = r.send('limit=100')
-    if (searchMode === 'unread') {
-      r = r.send('search=unread')
-    }
+    r = r.send('limit=100').send(`search=${searchMode}`)
     if (selectedIds.length !== 0) {
       r = r.send(`ids=${selectedIds.join(',')}`)
     }
@@ -75,6 +72,17 @@ export default {
   },
   deleteFeed(id, errCb, successCb) {
     request.delete(`${__API__}/feeds/${id}`)
+      .end((err, res) => {
+        if (err) {
+          errCb(err.response.text)
+          return
+        }
+        successCb(res.text)
+      })
+  },
+  saveNewsItem({ newsId, feedId }, errCb, successCb) {
+    request.post(`${__API__}/feeds/${feedId}/news/${newsId}`)
+      .send('action=toggle-save')
       .end((err, res) => {
         if (err) {
           errCb(err.response.text)

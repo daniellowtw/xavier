@@ -3,9 +3,12 @@ package db
 import (
 	"fmt"
 
-	"github.com/go-xorm/xorm"
-	"strings"
 	"strconv"
+	"strings"
+	"time"
+
+	"github.com/go-xorm/core"
+	"github.com/go-xorm/xorm"
 )
 
 type Client struct {
@@ -59,19 +62,19 @@ func (c *Client) GetNewsItem(id int64) (*FeedItem, error) {
 }
 
 func (c *Client) GetDataPoint(newsID int64) (*DataPoint, error) {
-	var res *DataPoint
-	ok, err := c.e.Where(fmt.Sprintf("news_id = %d", newsID)).Get(&res)
+	var res DataPoint
+	ok, err := c.e.Where(fmt.Sprintf("news_item_id = %d", newsID)).Get(&res)
 	if err != nil {
 		return nil, err
 	}
 	if !ok {
 		return nil, fmt.Errorf("get: not found")
 	}
-	return res, nil
+	return &res, nil
 }
 
 func (c *Client) SaveDataPoint(point *DataPoint) error {
-	_, err := c.e.Update(point)
+	_, err := c.e.Id(point.Id).Update(point)
 	return err
 }
 
@@ -184,6 +187,13 @@ func FilterFeedID(id int64) Filter {
 	}
 }
 
+func FilterSaved() Filter {
+	return func(s *xorm.Session) *xorm.Session {
+		// TODO this is tightly coupled to the name of the feed_item table
+		return s.Where("feed_item.id in (select news_item_id from saved_item)")
+	}
+}
+
 func (c *Client) MarkAsRead(newsID int64) error {
 	news := new(FeedItem)
 	ok, err := c.e.Id(newsID).Get(news)
@@ -200,9 +210,38 @@ func (c *Client) MarkAsRead(newsID int64) error {
 	return nil
 }
 
-func (c *Client) SearchNews(filters ...Filter) ([]*FeedItem, error) {
-	var fs []*FeedItem
+func (c *Client) ToggleSave(newsID int64, feedID int64) (bool, error) {
+	var x SavedItem
+	// Note: Ordering depends on order of struct
+	ok, err := c.e.Id(core.NewPK(feedID, newsID)).Get(&x)
+	if err != nil {
+		return false, err
+	}
+	if ok {
+		_, err := c.e.Delete(&x)
+		if err != nil {
+			return false, fmt.Errorf("db: failed to delete saved news: %v", err)
+		}
+		return false, nil
+	}
+	if _, err := c.e.InsertOne(&SavedItem{
+		NewsItemId: newsID,
+		FeedItemId: feedID,
+		Date:       time.Now(),
+	}); err != nil {
+		return false, fmt.Errorf("db: failed to save news: %v", err)
+	}
+	return true, nil
+}
+
+func (c *Client) SearchNews(filters ...Filter) ([]*ExtendedFeedItem, error) {
+	var fs []*ExtendedFeedItem
+	savedItemStr := `case when saved_item.news_item_id = feed_item.id then 1 else 0 end as is_saved` // used to figure out if something is in the other table or not
 	starting := c.e.NewSession()
+	starting = starting.SetExpr("foo", "case 1 end")
+	starting = starting.Select("feed_item.*, data_point.outcome as classification, " + savedItemStr)
+	starting = starting.Join("left", "saved_item", "saved_item.news_item_id = feed_item.id")
+	starting = starting.Join("left", "data_point", "data_point.news_item_id = feed_item.id")
 	for _, f := range filters {
 		starting = f(starting)
 	}

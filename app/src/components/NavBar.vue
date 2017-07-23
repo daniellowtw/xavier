@@ -5,7 +5,7 @@
       <a v-on:click='changeMode("news")' class='navbar-item is-tab'>News</a>
     </div>
     <div class="nav-right">
-      <a v-on:click='toggleDebug()' class='navbar-item is-active'>Debug: {{isDebug}}</a>
+      <a v-on:click='toggleDebug()' class='navbar-item'>Debug: {{isDebug}}</a>
     </div>
   </nav>
 </template>

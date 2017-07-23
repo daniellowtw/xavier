@@ -16,6 +16,7 @@ export default new Vuex.Store({
     news: [],
     currentNewsId: 0,
     currentNewsClassification: 0,
+    isCurrentNewsSaved: false,
   },
   mutations: {
     updateSources(state, sources) {
@@ -33,7 +34,6 @@ export default new Vuex.Store({
         return
       }
       state.currentNewsId = newsId
-      state.currentNewsClassification = selectedNews.classification
       if (selectedNews.Read) {
         state.currentNewsId = newsId
         return
@@ -46,12 +46,14 @@ export default new Vuex.Store({
     },
     classifyNews(state, { newsId, classification }) {
       let selectedNews = state.news.find(x => x.Id === newsId)
-      selectedNews.classification = classification
-      state.currentNewsClassification = classification
+      selectedNews.Classification = classification
+    },
+    saveCurrentNews(state, { newsId, isSaved }) {
+      let selectedNews = state.news.find(x => x.Id === newsId)
+      selectedNews.IsSaved = isSaved
     },
     // TODO: think of a better way for alerting.
     notify(state, { title, body, type }) {
-      console.log(title, body, type)
       swal(title, body, type)
     },
     changeMode(state, mode) {
@@ -100,6 +102,12 @@ export default new Vuex.Store({
     deleteFeed({ commit, dispatch }, feedId) {
       api.deleteFeed(feedId, x => commit('notify', { title: 'Error', body: x, type: 'error' }), () => {
         dispatch('loadSources')
+      })
+    },
+    saveNewsItem({ commit }, { newsId, feedId }) {
+      api.saveNewsItem({ newsId, feedId }, x => commit('notify', { title: 'Error', body: x, type: 'error' }), (x) => {
+        let isSaved = (x === 'true')
+        commit('saveCurrentNews', { newsId, isSaved })
       })
     },
   },

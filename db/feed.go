@@ -41,6 +41,17 @@ type FeedItem struct {
 	Custom      map[string]string
 }
 
+// feedItem with metadata
+type ExtendedFeedItem struct {
+	*FeedItem      `xorm:"extends"`
+	IsSaved        bool
+	Classification UserClassification
+}
+
+func (ExtendedFeedItem) TableName() string {
+	return "feed_item"
+}
+
 func ToFeedItem(feedID int64, i *gofeed.Item) *FeedItem {
 	encl, _ := json.Marshal(i.Enclosures)
 	author := ""

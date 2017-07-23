@@ -5,6 +5,11 @@
     <div class="level-left">
       <div class="field has-addons">
         <p class="control">
+          <a class="button" v-on:click="changeMode('saved')" v-bind:class="{'is-primary':this.searchMode === 'saved'}">
+            <span>Saved</span>
+          </a>
+        </p>
+        <p class="control">
           <a class="button" v-on:click="changeMode('unread')" v-bind:class="{'is-primary':this.searchMode === 'unread'}">
             <span>Unread</span>
           </a>

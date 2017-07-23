@@ -76,7 +76,12 @@ func Register(s *Service, group *mux.Router) {
 		json.NewEncoder(w).Encode(things)
 	})
 	group.Methods(http.MethodPost).Path("/feeds/{feed_id}/news/{news_id}").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		newsId, err := strconv.ParseInt(mux.Vars(r)["news_id"], 10, 64)
+		newsID, err := strconv.ParseInt(mux.Vars(r)["news_id"], 10, 64)
+		if err != nil {
+			writeErr(w, http.StatusBadRequest, err)
+			return
+		}
+		feedID, err := strconv.ParseInt(mux.Vars(r)["news_id"], 10, 64)
 		if err != nil {
 			writeErr(w, http.StatusBadRequest, err)
 			return
@@ -85,7 +90,15 @@ func Register(s *Service, group *mux.Router) {
 		action := r.Form.Get("action")
 		switch action {
 		case "read":
-			writeErr(w, http.StatusBadRequest, s.MarkAsRead(newsId))
+			writeErr(w, http.StatusBadRequest, s.MarkAsRead(newsID))
+			return
+		case "toggle-save":
+			isSaved, err := s.ToggleNews(newsID, feedID)
+			if err != nil {
+				writeErr(w, http.StatusInternalServerError, err)
+				return
+			}
+			w.Write([]byte(fmt.Sprintf("%v", isSaved)))
 			return
 		default:
 		}
@@ -103,10 +116,6 @@ func Register(s *Service, group *mux.Router) {
 			limit = int(newLimit)
 		}
 		searchMode := r.Form.Get("search")
-		includeRead := true
-		if searchMode == "unread" {
-			includeRead = false
-		}
 		var searchIds []int64
 		feedIDs := r.Form.Get("ids")
 		if feedIDs != "" {
@@ -118,7 +127,7 @@ func Register(s *Service, group *mux.Router) {
 				searchIds = append(searchIds, ii)
 			}
 		}
-		things, err := s.Search(SearchParam{IncludeRead: includeRead, Limit: limit, FeedIDs: searchIds})
+		things, err := s.Search(SearchParam{SearchMode: searchMode, Limit: limit, FeedIDs: searchIds})
 		if err != nil {
 			writeErr(w, http.StatusInternalServerError, err)
 			return
@@ -139,12 +148,13 @@ func Register(s *Service, group *mux.Router) {
 			return
 		}
 		switch classification {
+		// TODO These cases are too brittle
 		case "1":
-			s.HumanClassification(newsId, db.POSITIVE)
-		case "-1":
-			s.HumanClassification(newsId, db.NEGATIVE)
+			writeErr(w, http.StatusBadRequest, s.HumanClassification(newsId, db.POSITIVE))
+		case "2":
+			writeErr(w, http.StatusBadRequest, s.HumanClassification(newsId, db.NEGATIVE))
 		default:
-			writeErr(w, http.StatusBadRequest, fmt.Errorf("can't prase classification"))
+			writeErr(w, http.StatusBadRequest, fmt.Errorf("can't parse classification"))
 		}
 		return
 	})

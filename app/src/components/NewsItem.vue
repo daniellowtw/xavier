@@ -26,9 +26,9 @@
       </div>
     </div>
     <footer class="card-footer" v-show="show">
-      <a class="card-footer-item" v-on:click="classify(-1)" v-bind:class="{'is-primary': (this.currentNewsClassification === -1)}">Don't like it</a>
-      <a class="card-footer-item">Save</a>
-      <a class="card-footer-item" v-on:click="classify(1)" v-bind:class="{'is-primary': (this.currentNewsClassification === 1)}">Like it</a>
+      <a class="card-footer-item" v-on:click="classify(2)" v-bind:class="{'is-primary': (news.Classification === 2)}">Don't like it</a>
+      <a class="card-footer-item" v-on:click="save()" v-bind:class="{'is-primary': (news.IsSaved)}">Save</a>
+      <a class="card-footer-item" v-on:click="classify(1)" v-bind:class="{'is-primary': (news.Classification === 1)}">Like it</a>
     </footer>
   </div>
 </template>
@@ -43,7 +43,6 @@ export default Vue.component('news-item', {
       isDebug: 'isDebug',
       sources: 'sources',
       currentNewsId: 'currentNewsId',
-      currentNewsClassification: 'currentNewsClassification',
     }),
   },
   data() {
@@ -62,6 +61,9 @@ export default Vue.component('news-item', {
     },
     classify(v) {
       this.$store.dispatch('classify', { newsId: this.news.Id, feedId: this.news.FeedId, classification: v })
+    },
+    save() {
+      this.$store.dispatch('saveNewsItem', { newsId: this.news.Id, feedId: this.news.FeedId })
     }
   },
   watch: {
