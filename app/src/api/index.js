@@ -55,12 +55,33 @@ export default {
   },
   refreshFeed(errCb, successCb) {
     request.post(`${__API__}/feeds`).end((err, res) => {
-      this.isLoading = false
       if (err) {
-        errCb(err)
+        errCb(err.response.text)
         return
       }
       successCb(res.text)
     })
-  }
+  },
+  addFeed(url, errCb, successCb) {
+    request.put(`${__API__}/feeds`)
+      .send(`url=${url}`)
+      .end((err, res) => {
+        if (err) {
+          errCb(err.response.text)
+          return
+        }
+        successCb(res.text)
+      })
+  },
+  deleteFeed(id, errCb, successCb) {
+    request.delete(`${__API__}/feeds/${id}`)
+      .end((err, res) => {
+        if (err) {
+          errCb(err.response.text)
+          return
+        }
+        successCb(res.text)
+      })
+  },
+
 }

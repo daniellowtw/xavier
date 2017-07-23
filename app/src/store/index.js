@@ -51,6 +51,7 @@ export default new Vuex.Store({
     },
     // TODO: think of a better way for alerting.
     notify(state, { title, body, type }) {
+      console.log(title, body, type)
       swal(title, body, type)
     },
     changeMode(state, mode) {
@@ -59,6 +60,7 @@ export default new Vuex.Store({
   },
   actions: {
     loadSources({ commit }) {
+      console.log('foooo')
       api.loadSources(console.log, x => commit('updateSources', x))
     },
     loadNews({ commit }, { selectedSources, searchMode }) {
@@ -86,7 +88,20 @@ export default new Vuex.Store({
       api.refreshFeed(console.log, x => {
         commit('notify', { title: 'Updated feeds', body: x, type: 'success' })
       })
-    }
+    },
+    addFeed({ commit, dispatch }, url) {
+      return new Promise((resolve, reject) => {
+        api.addFeed(url, x => commit('notify', { title: 'Error', body: x, type: 'error' }), () => {
+          dispatch('loadSources')
+          resolve()
+        })
+      })
+    },
+    deleteFeed({ commit, dispatch }, feedId) {
+      api.deleteFeed(feedId, x => commit('notify', { title: 'Error', body: x, type: 'error' }), () => {
+        dispatch('loadSources')
+      })
+    },
   },
   strict: debug,
 })

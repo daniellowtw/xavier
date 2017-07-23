@@ -30,13 +30,7 @@
               <td>{{feed.UnreadCount}}/{{feed.TotalCount}}</td>
               <td>{{feed.LastUpdated}}</td>
               <td class="is-icon">
-                <a href="#">
-                  <i class="fa fa-refresh"></i>
-                </a>
-                <a href="#" @click.prevent="editFeed(feed)">
-                  <i class="fa fa-edit"></i>
-                </a>
-                <a href="#" @click.prevent="removeFeed(feed)">
+                <a class="icon" @click.prevent="removeFeed(feed)">
                   <i class="fa fa-trash"></i>
                 </a>
               </td>
@@ -67,6 +61,9 @@ export default {
     onChangePage(page) {
       this.page = page
     },
+    removeFeed(f) {
+      this.$store.dispatch('deleteFeed', f.Id)
+    }
   },
   data() {
     return {

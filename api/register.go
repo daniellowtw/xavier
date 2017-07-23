@@ -29,6 +29,14 @@ func Register(s *Service, group *mux.Router) {
 		}
 		w.Write([]byte(fmt.Sprintf("updated %d items", total)))
 	})
+	group.Methods(http.MethodPut).Path("/feeds").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		url := r.Form.Get("url")
+		if err := s.AddFeed(url); err != nil {
+			writeErr(w, http.StatusInternalServerError, err)
+			return
+		}
+	})
 	group.Methods(http.MethodDelete).Path("/feeds/{id}").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		feedID := mux.Vars(r)["id"]
 		n, err := strconv.ParseInt(feedID, 10, 64)
