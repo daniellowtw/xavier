@@ -40,8 +40,8 @@ export default {
   },
   classify({ newsId, classification }, errCb, successCb) {
     request.post(`${__API__}/learn`)
-      .send(`news_id=${newsId}`) // sending string automatically makes it form URL encoded
-      .send(`classification=${classification}`) // sending string automatically makes it form URL encoded
+      .send(`news_id=${newsId}`)
+      .send(`classification=${classification}`)
       .end((err, res) => {
         if (err) {
           console.log(err)

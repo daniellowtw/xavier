@@ -24,6 +24,12 @@
   
     <!-- Right side -->
     <div class="level-right">
+      <div class="level-item">
+        <a class="button is-success" v-on:click="classifyAllAsDislike()">Mark all unclassified as dislike</a>
+      </div>
+      <div class="level-item">
+        <a class="button is-success" v-on:click="markAllAsRead()">Mark all as read</a>
+      </div>
     </div>
   </nav>
 </template>
@@ -34,7 +40,8 @@ import { mapState } from 'vuex'
 export default Vue.component('news-bar', {
   props: ['searchMode'],
   computed: mapState({
-    isDebug: 'isDebug'
+    isDebug: 'isDebug',
+    news: 'news',
   }),
   data() {
     return {
@@ -44,6 +51,13 @@ export default Vue.component('news-bar', {
   methods: {
     changeMode(v) {
       this.$emit('changeMode', v)
+    },
+    classifyAllAsDislike() {
+      let d = this.$store.dispatch
+      this.news.filter(x => x.Classification === 0).forEach(x => d('classify', { newsId: x.Id, feedId: x.FeedId, classification: 2 }))
+    },
+    markAllAsRead() {
+      this.news.forEach(x => this.$store.dispatch('markRead', { newsId: x.Id, feedId: x.FeedId }))
     }
   }
 })
