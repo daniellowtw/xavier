@@ -187,6 +187,12 @@ func FilterFeedID(id int64) Filter {
 	}
 }
 
+func FilterGUID(guid string) Filter {
+	return func(s *xorm.Session) *xorm.Session {
+		return s.Where(fmt.Sprintf("guid = '%s'", guid))
+	}
+}
+
 func FilterSaved() Filter {
 	return func(s *xorm.Session) *xorm.Session {
 		// TODO this is tightly coupled to the name of the feed_item table

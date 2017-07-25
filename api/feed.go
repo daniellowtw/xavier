@@ -86,7 +86,17 @@ func (s *FeedService) updateFeedFromURL(f *db.FeedSource) (int, error) {
 				continue
 			}
 		} else {
-			fmt.Println("Cannot parsed published time nor updated time. Feed will most likely have duplicated items.")
+			found, err := s.findFeedItemByGUID(f.Id, i.GUID)
+			if err != nil {
+				fmt.Printf("skipping because cannot find feed by guid to check for duplicate: %v ", err)
+				continue
+			}
+			if found {
+				// assume items are sorted reverse chronological order. When we find one item, we have should have the rest of the items.
+				break
+			}
+			i.Published = time.Now().Format(time.RFC3339)
+			i.Updated = i.Published
 		}
 		fixFeedItem(i)
 		err := s.dbClient.AddNews(f.Id, db.ToFeedItem(f.Id, i))
@@ -99,6 +109,14 @@ func (s *FeedService) updateFeedFromURL(f *db.FeedSource) (int, error) {
 	f.LastChecked = time.Now()
 	s.dbClient.UpdateFeedSource(f)
 	return updatedItemCount, err
+}
+
+func (s *FeedService) findFeedItemByGUID(feedID int64, guid string) (found bool, err error) {
+	res, err := s.dbClient.SearchNews(db.FilterFeedID(feedID), db.FilterGUID(guid))
+	if err != nil {
+		return false, err
+	}
+	return len(res) > 0, nil
 }
 
 func (s *FeedService) UpdateFeed(feedID int64) error {
@@ -143,7 +161,8 @@ func (s *FeedService) UpdateAllFeeds() (int, error) {
 	for _, f := range fs {
 		n, err := s.updateFeedFromURL(f.FeedSource)
 		if err != nil {
-			return 0, err
+			fmt.Printf("Could not update feed id %d: %s: %v", f.Id, f.Title, err)
+			continue
 		}
 		total += n
 		fmt.Printf("Updated db %s\n", f.Title)
