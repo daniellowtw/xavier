@@ -26,9 +26,10 @@ func (s *NewsService) Search(param SearchParam) ([]*db.ExtendedFeedItem, error) 
 		filters = append(filters, db.FilterSaved())
 	default:
 	}
-	if param.Limit != 0 {
-		filters = append(filters, db.FilterLimit(param.Limit))
+	if param.Limit == 0 {
+		param.Limit = 100
 	}
+	filters = append(filters, db.FilterLimit(param.Limit))
 	if len(param.FeedIDs) != 0 {
 		filters = append(filters, db.FilterFeedIds(param.FeedIDs))
 	}
