@@ -251,6 +251,7 @@ func (c *Client) SearchNews(filters ...Filter) ([]*ExtendedFeedItem, error) {
 	for _, f := range filters {
 		starting = f(starting)
 	}
+	starting = starting.Desc("id")
 	err := starting.Find(&fs)
 	if err != nil {
 		return nil, err
