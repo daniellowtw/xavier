@@ -19,8 +19,12 @@ type FeedService struct {
 	dbClient *db.Client
 }
 
-func (s *FeedService) ListAllFeeds() ([]*db.FeedSourceWithUnread, error) {
+func (s *FeedService) ListAllFeeds() ([]*db.FeedSource, error) {
 	return s.dbClient.GetActiveFeedSources()
+}
+
+func (s *FeedService) ListAllFeedsWithStats() ([]*db.FeedSourceWithUnread, error) {
+	return s.dbClient.GetActiveFeedSourcesWithStats()
 }
 
 // AddFeed and then update it
@@ -159,7 +163,7 @@ func (s *FeedService) UpdateAllFeeds() (int, error) {
 	total := 0
 	fmt.Printf("Found %d feeds to update\n", len(fs))
 	for _, f := range fs {
-		n, err := s.updateFeedFromURL(f.FeedSource)
+		n, err := s.updateFeedFromURL(f)
 		if err != nil {
 			fmt.Printf("Could not update feed id %d: %s: %v", f.Id, f.Title, err)
 			continue

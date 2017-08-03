@@ -60,7 +60,7 @@ var (
 				return err
 			}
 			for _, f := range feeds {
-				fmt.Println(f.Id, f.Title, f.Description, f.UnreadCount, f.TotalCount)
+				fmt.Println(f.Id, f.Title, f.Description)
 			}
 			return nil
 		},

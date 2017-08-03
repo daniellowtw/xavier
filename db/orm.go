@@ -45,8 +45,17 @@ func (c *Client) DeleteFeedSource(id int64) error {
 	return nil
 }
 
-func (c *Client) GetActiveFeedSources() ([]*FeedSourceWithUnread, error) {
-	return ListAllFeeds(c.e)
+func (c *Client) GetActiveFeedSources() ([]*FeedSource, error) {
+	var res []*FeedSource
+	err := c.e.Where("active = 1").Find(&res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (c *Client) GetActiveFeedSourcesWithStats() ([]*FeedSourceWithUnread, error) {
+	return ListAllFeedsWithStats(c.e)
 }
 
 func (c *Client) GetNewsItem(id int64) (*FeedItem, error) {

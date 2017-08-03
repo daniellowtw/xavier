@@ -15,8 +15,8 @@ func (FeedSourceWithUnread) TableName() string {
 	return "feed_item"
 }
 
-// returns active feeds
-func ListAllFeeds(engine *xorm.Engine) ([]*FeedSourceWithUnread, error) {
+// ListAllFeedsWithStatus returns the feeds along with its stats. Note: This can be quite slow.
+func ListAllFeedsWithStats(engine *xorm.Engine) ([]*FeedSourceWithUnread, error) {
 	var fs []*FeedSourceWithUnread
 	err := engine.SQL(` select *, (select count(*) from feed_item as y where y.feed_id = s.id and read = 0) as unread_count, (select count(*) from feed_item as y where y.feed_id = s.id) as total_count from feed_source s where active = 1`).Find(&fs)
 	if err != nil {
