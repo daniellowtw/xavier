@@ -1,8 +1,8 @@
 <template>
-  <section class="section">
+  <div class="container  scroll-y-parent">
     <feed-bar></feed-bar>
-    <div class="columns">
-      <div class="column is-12">
+    <div class=" scroll-y-parent columns">
+      <div class="scroll-y column is-12">
         <table class="table is-narrow is-bordered">
           <thead>
             <th>Name</th>
@@ -40,7 +40,7 @@
         <pagination :total="total" :page="page" :items-per-page="itemsPerPage" @change-page="onChangePage"></pagination>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>

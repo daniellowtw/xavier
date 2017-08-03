@@ -1,6 +1,6 @@
 <template>
   <!-- Main container -->
-  <nav class="level">
+  <nav id="news-bar" class="level">
     <!-- Left side -->
     <div class="level-left">
       <div class="field has-addons">
@@ -33,6 +33,11 @@
     </div>
   </nav>
 </template>
+<style>
+#news-bar {
+  padding-top: 10px;
+}
+</style>
 
 <script>
 import Vue from 'vue'

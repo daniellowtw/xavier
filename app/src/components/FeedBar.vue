@@ -1,6 +1,6 @@
 <template>
   <!-- Main container -->
-  <nav class="level">
+  <nav id="feed-bar" class="level">
     <!-- Left side -->
     <div class="level-left">
     </div>
@@ -37,6 +37,12 @@
     </div>
   </nav>
 </template>
+<style>
+#feed-bar {
+  padding-top: 10px;
+}
+</style>
+</style>
 
 <script>
 import Vue from 'vue'

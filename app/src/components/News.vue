@@ -1,13 +1,13 @@
 <template>
-  <section class="section">
+  <div class="container scroll-y-parent">
     <news-bar :searchMode="searchMode" @changeMode="onChangeMode"></news-bar>
-    <div class="columns">
-      <news-menu class="column is-3" @toggle-source="chooseNewsSource" :selectedSources="selectedSources"></news-menu>
-      <div class="column is-9">
+    <div class="scroll-y-parent columns">
+      <news-menu class="scroll-y column is-3" @toggle-source="chooseNewsSource" :selectedSources="selectedSources"></news-menu>
+      <div class="scroll-y column is-9">
         <news-item v-for="newsItem in news" :key="newsItem.Id" :news="newsItem"></news-item>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
@@ -67,3 +67,4 @@ export default {
   },
 }
 </script>
+
