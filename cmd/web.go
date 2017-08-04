@@ -18,6 +18,7 @@ var (
 			api.Register(s, subRouter)
 			r.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(r.URL.Path)
+				w.WriteHeader(404)
 			})
 			fmt.Printf("Server running on port %d\n", Port)
 			return http.ListenAndServe(fmt.Sprintf(":%d", Port), r)

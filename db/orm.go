@@ -209,6 +209,15 @@ func FilterSaved() Filter {
 	}
 }
 
+func (c *Client) MarkAsReadMulti(newsID []int64) error {
+	ids := strings.Replace(strings.Trim(fmt.Sprintf("%v", newsID), "[]"), " ", ",", -1)
+	query := fmt.Sprintf(`update %s set read = 1 where id in (%s)`, "feed_item", ids)
+	if _, err := c.e.Exec(query); err != nil {
+		return fmt.Errorf("db: failed to update news: %v", err)
+	}
+	return nil
+}
+
 func (c *Client) MarkAsRead(newsID int64) error {
 	news := new(FeedItem)
 	ok, err := c.e.Id(newsID).Get(news)

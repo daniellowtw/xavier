@@ -62,7 +62,8 @@ export default Vue.component('news-bar', {
       this.news.filter(x => x.Classification === 0).forEach(x => d('classify', { newsId: x.Id, feedId: x.FeedId, classification: 2 }))
     },
     markAllAsRead() {
-      this.news.forEach(x => this.$store.dispatch('markRead', { newsId: x.Id, feedId: x.FeedId }))
+      console.log(1, this.news)
+      this.$store.dispatch('markReadMulti', this.news)
     }
   }
 })

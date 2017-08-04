@@ -44,6 +44,11 @@ func (s *NewsService) MarkAsRead(newsID int64) error {
 	return s.dbClient.MarkAsRead(newsID)
 }
 
+// TODO: combine with single
+func (s *NewsService) MarkAsReadMulti(newsID []int64) error {
+	return s.dbClient.MarkAsReadMulti(newsID)
+}
+
 func (s *NewsService) ToggleNews(newsID int64, feedID int64) (bool, error) {
 	return s.dbClient.ToggleSave(newsID, feedID)
 }

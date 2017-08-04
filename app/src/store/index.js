@@ -71,6 +71,14 @@ export default new Vuex.Store({
         searchMode,
       }, console.log, x => commit('updateNews', x))
     },
+    markReadMulti({ commit }, news) {
+      console.log(news)
+      api.markReadMulti({ newsIds: news.map(x => x.Id) }, console.log, () => {
+        news.forEach(p => {
+          commit('readNews', { newsId: p.Id, feedId: p.FeedId })
+        })
+      })
+    },
     markRead({ commit }, { newsId, feedId }) {
       api.markRead({
         newsId,

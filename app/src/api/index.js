@@ -38,6 +38,18 @@ export default {
         successCb()
       })
   },
+  markReadMulti({ newsIds }, errCb, successCb) {
+    const formattedNewsIds = formatNewsIds(newsIds)
+    request.post(`${__API__}/read`)
+      .send(`news_id=${formattedNewsIds}`)
+      .end((err, res) => {
+        if (err) {
+          errCb(err)
+          return
+        }
+        successCb()
+      })
+  },
   classify({ newsId, classification }, errCb, successCb) {
     request.post(`${__API__}/learn`)
       .send(`news_id=${newsId}`)
@@ -92,4 +104,10 @@ export default {
       })
   },
 
+}
+
+function formatNewsIds(newsIds) {
+  let res = ''
+  newsIds.forEach(x => { res += `${x},` })
+  return res.substr(0, res.length - 1)
 }

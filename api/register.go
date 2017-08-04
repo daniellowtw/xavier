@@ -134,6 +134,13 @@ func Register(s *Service, group *mux.Router) {
 		}
 		json.NewEncoder(w).Encode(things)
 	})
+	group.Methods(http.MethodPost).Path("/read").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		newsIDString := r.Form.Get("news_id")
+		if err := s.NewsService.MarkAsReadMulti(parseMultiInt(newsIDString)); err != nil {
+			writeErr(w, http.StatusBadRequest, fmt.Errorf("cannot mark all as read"))
+		}
+	})
 	group.Methods(http.MethodPost).Path("/learn").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		newsIDString := r.Form.Get("news_id")
@@ -158,4 +165,17 @@ func Register(s *Service, group *mux.Router) {
 		}
 		return
 	})
+}
+
+// returns valid ints
+func parseMultiInt(s string) []int64 {
+	var res []int64
+	for _, i := range strings.Split(s, ",") {
+		j, err := strconv.ParseInt(i, 10, 64)
+		if err != nil {
+			continue
+		}
+		res = append(res, j)
+	}
+	return res
 }
