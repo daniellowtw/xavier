@@ -9,9 +9,6 @@ import (
 )
 
 func main() {
-	rootCmd := &cobra.Command{
-		Use: os.Args[0],
-	}
 	verCmd := &cobra.Command{
 		Use:   "version",
 		Short: "Print the current version of the program",
@@ -19,18 +16,9 @@ func main() {
 			fmt.Println(version)
 		},
 	}
-	rootCmd.AddCommand(verCmd)
-	rootCmd.AddCommand(cmd.AddCmd,
-		cmd.UpdateAllCmd,
-		cmd.DebugCmd,
-		cmd.UpdateFeedCmd,
-		cmd.ListAllCmd,
-		cmd.DeleteCmd,
-		cmd.WebCmd,
-		cmd.ImportFeedSourceFromFileCmd,
-		cmd.AddNewToQueueCmd,
-		cmd.LearnCmd)
-	if err := rootCmd.Execute(); err != nil {
+	cmd.RootCmd.AddCommand(verCmd)
+	if err := cmd.RootCmd.Execute(); err != nil {
 		fmt.Println(err)
+		os.Exit(1)
 	}
 }

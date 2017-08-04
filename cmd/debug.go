@@ -19,6 +19,10 @@ var (
 			if err != nil {
 				return err
 			}
+			s, err := newServiceFromCmd(cmd)
+			if err != nil {
+				return err
+			}
 			data, err := s.DebugFeed(i)
 			fmt.Printf("%s\n", data)
 			return nil

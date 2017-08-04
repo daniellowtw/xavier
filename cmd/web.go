@@ -2,17 +2,22 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/daniellowtw/xavier/api"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
-	"net/http"
 )
 
-var (
-	Port   = 9090
-	WebCmd = &cobra.Command{
+func NewWebCmd() *cobra.Command {
+	var Port int
+	cmd := &cobra.Command{
 		Use: "web",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			s, err := newServiceFromCmd(cmd)
+			if err != nil {
+				return err
+			}
 			r := mux.NewRouter()
 			subRouter := r.PathPrefix("/_api").Subrouter()
 			api.Register(s, subRouter)
@@ -24,4 +29,6 @@ var (
 			return http.ListenAndServe(fmt.Sprintf(":%d", Port), r)
 		},
 	}
-)
+	cmd.Flags().IntVarP(&Port, "port", "p", 9090, "port to run the API server on")
+	return cmd
+}

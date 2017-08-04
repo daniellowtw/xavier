@@ -15,8 +15,23 @@ type Client struct {
 	e *xorm.Engine
 }
 
-func NewClient(e *xorm.Engine) *Client {
-	return &Client{e}
+func NewSqlite3Client(dbFile string, showSql bool, logLevel core.LogLevel) (*Client, error) {
+	ee, err := xorm.NewEngine("sqlite3", dbFile)
+	if err != nil {
+		return nil, err
+	}
+	ee.ShowSQL(showSql)
+	ee.Logger().SetLevel(logLevel)
+	if err := ee.CreateTables(
+		&FeedSource{},
+		&FeedItem{},
+		&DataPoint{},
+		&ProcessQueue{},
+		&SavedItem{},
+	); err != nil {
+		return nil, err
+	}
+	return &Client{ee}, nil
 }
 
 func (c *Client) UpdateFeedSource(f *FeedSource) error {

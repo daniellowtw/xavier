@@ -1,15 +1,16 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"fmt"
+
 	"github.com/gilliek/go-opml/opml"
+	"github.com/spf13/cobra"
 )
 
 var (
 	ImportFeedSourceFromFileCmd = &cobra.Command{
 		Use: "import",
-		RunE: func(_ *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 1 {
 				return fmt.Errorf("first arg is file name")
 			}
@@ -19,14 +20,17 @@ var (
 			}
 			importCount := 0
 			logErr := func(err error) {
-				if err!= nil {
+				if err != nil {
 					fmt.Println(err.Error())
 					return
 				}
-				importCount ++
+				importCount++
+			}
+			s, err := newServiceFromCmd(cmd)
+			if err != nil {
+				return err
 			}
 			for _, out := range flattenOutlines(in.Outlines()) {
-
 				switch {
 				case out.XMLURL != "":
 					fmt.Println("XML", out.XMLURL)
@@ -42,7 +46,6 @@ var (
 			fmt.Printf("Imported %d feeds\n", importCount)
 			return nil
 		},
-
 	}
 )
 
