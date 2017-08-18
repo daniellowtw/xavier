@@ -25,7 +25,7 @@ type FeedSource struct {
 
 type FeedItem struct {
 	// auto public key
-	Id     int64 `xorm:"index"`
+	Id     int64
 	FeedId int64 `xorm:"index"`
 	Read   bool  `xorm:"index"`
 
