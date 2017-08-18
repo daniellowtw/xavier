@@ -1,14 +1,22 @@
 <template>
   <div class="card">
-    <header class="card-header clickable">
-      <p class="card-header-title" v-on:click="toggleShow" v-bind:class="{read: (news.Read)}">
+    <header class="card-header">
+      <p class="card-header-title" v-bind:class="{read: (news.Read)}">
+        <span class="icon clickable">
+            <i v-if="news.IsSaved" v-on:click="save()" class="fa fa-star" aria-hidden="true"></i>
+            <i v-else v-on:click="save()" class="fa fa-star-o" aria-hidden="true"></i>
+        </span>
+
         <span class="icon">
           <i>
             <img v-bind:src="favIcon">
           </i>
-        </span> {{news.Title}}
+        </span>
+        <span v-on:click="toggleShow" class="clickable">  
+          {{news.Title}}
+        </span>
         <span class="entry-separator">•</span>
-        <a v-bind:href="news.LinkHref" class="sub"> {{news.Published}}</a>
+        <a v-bind:href="news.LinkHref" class="sub" target="blank"> {{news.Published}}</a>
       </p>
       <a class="card-header-icon">
         <span class="icon">
@@ -52,7 +60,14 @@ export default Vue.component('news-item', {
     }
   },
   methods: {
-    toggleShow() {
+    toggleShow(evt) {
+      var curr = evt.srcElement
+      var max = 3
+      while (max > 0 && curr !== undefined && curr.className !== 'card') {
+        curr = curr.parentNode
+        max -= 1
+      }
+      curr.scrollIntoView()
       this.show = !this.show
       this.markRead()
     },
@@ -76,28 +91,28 @@ export default Vue.component('news-item', {
 })
 </script>
 <style>
-.clickable {
-  cursor: pointer;
-}
-
-.read {
-  font-size: small;
-}
-
-.is-primary {
-  color: #fff;
-  background-color: #00d1b2;
-}
-
-.sub {
-  display: inline;
-  color: #aaa;
-  align-self: center;
-  font-size: 0.7em;
-}
-
-.entry-separator {
-  margin-right: 5px;
-  margin-left: 5px
-}
+  .clickable {
+    cursor: pointer;
+  }
+  
+  .read {
+    font-size: small;
+  }
+  
+  .is-primary {
+    color: #fff;
+    background-color: #00d1b2;
+  }
+  
+  .sub {
+    display: inline;
+    color: #aaa;
+    align-self: center;
+    font-size: 0.7em;
+  }
+  
+  .entry-separator {
+    margin-right: 5px;
+    margin-left: 5px
+  }
 </style>
