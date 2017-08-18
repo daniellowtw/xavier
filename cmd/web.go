@@ -19,7 +19,9 @@ func NewWebCmd() *cobra.Command {
 				return err
 			}
 			r := mux.NewRouter()
-			subRouter := r.PathPrefix("/_api").Subrouter()
+			subRouter := r.PathPrefix("/api").Subrouter()
+			r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(assetFS())))
+			//r.Handle("/", http.FileServer(assetFS()))
 			api.Register(s, subRouter)
 			r.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(r.URL.Path)

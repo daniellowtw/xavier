@@ -62,9 +62,6 @@ export default {
       selectedSources: [],
     }
   },
-  created() {
-    this.loadNews()
-  },
 }
 </script>
 

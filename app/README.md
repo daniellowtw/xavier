@@ -18,4 +18,8 @@ npm run build
 npm run build --report
 ```
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+## Release
+
+1. `go-bindata-assetfs -pkg cmd dist/...`
+2. Copy the generated file into ../cmd
+3. go build
