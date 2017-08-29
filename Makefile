@@ -1,4 +1,4 @@
 default:
 	go build
 pi:
-	GOARCH=arm GOARM=5 GOOS=linux go build --tags "libsqlite3 linux"
+CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7 go build
