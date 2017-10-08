@@ -15,7 +15,7 @@ const (
 
 const (
 	MarkAsRead RuleAction = iota
-	Flag RuleAction = iota
+	Flag
 	Delete
 	Save
 )
