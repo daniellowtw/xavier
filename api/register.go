@@ -1,3 +1,4 @@
+// This file exposes the http api endpoints and marshals the input and calls the respective service
 package api
 
 import (

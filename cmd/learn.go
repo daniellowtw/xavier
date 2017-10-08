@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/daniellowtw/xavier/api"
+	"github.com/daniellowtw/xavier/db"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +14,8 @@ func NewLearnCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if err := e.PopulateProcessQueue(); err != nil {
+			client := &db.DataPointClient{e.Engine}
+			if err := client.PopulateProcessQueue(); err != nil {
 				return err
 			}
 			s := api.NewService(e)

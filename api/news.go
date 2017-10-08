@@ -6,7 +6,8 @@ import (
 
 // NewsService is implements the API
 type NewsService struct {
-	dbClient *db.Client
+	dbClient       *db.Client
+	saveItemClient *db.SavedItemClient
 }
 
 type SearchParam struct {
@@ -50,5 +51,5 @@ func (s *NewsService) MarkAsReadMulti(newsID []int64) error {
 }
 
 func (s *NewsService) ToggleNews(newsID int64, feedID int64) (bool, error) {
-	return s.dbClient.ToggleSave(newsID, feedID)
+	return s.saveItemClient.ToggleSave(newsID, feedID)
 }

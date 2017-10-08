@@ -5,7 +5,6 @@ import (
 
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
@@ -88,48 +87,6 @@ func (c *Client) GetNewsItem(id int64) (*FeedItem, error) {
 		return nil, fmt.Errorf("get: not found")
 	}
 	return &i, nil
-}
-
-func (c *Client) GetDataPoint(newsID int64) (*DataPoint, error) {
-	var res DataPoint
-	ok, err := c.e.Where(fmt.Sprintf("news_item_id = %d", newsID)).Get(&res)
-	if err != nil {
-		return nil, err
-	}
-	if !ok {
-		return nil, fmt.Errorf("get: not found")
-	}
-	return &res, nil
-}
-
-func (c *Client) SaveDataPoint(point *DataPoint) error {
-	_, err := c.e.Id(point.Id).Update(point)
-	return err
-}
-
-func (c *Client) GetProcessQueue() ([]*ProcessQueue, error) {
-	//func (c *Client) GetProcessQueue() ([]*FeedItem, error) {
-	var res []*ProcessQueue
-	if err := c.e.Find(&res); err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
-func (c *Client) MarkAsProcessed(q *ProcessQueue, keywords []string) error {
-	if _, err := c.e.Insert(&DataPoint{NewsItemId: q.NewsItemId, Keywords: keywords}); err != nil {
-		return err
-	}
-	// Note: this is not atomic. TODO for future
-	if _, err := c.e.Delete(q); err != nil {
-		return err
-	}
-	return nil
-}
-
-// look through datapoints and find news feed that is not a point yet.
-func (c *Client) PopulateProcessQueue() error {
-	return populateUnprocessedNews(c.e)
 }
 
 func (c *Client) CheckWhetherSourceExist(url string) (bool, error) {
@@ -252,31 +209,6 @@ func (c *Client) MarkAsRead(newsID int64) error {
 		return fmt.Errorf("db: failed to update news: %v", err)
 	}
 	return nil
-}
-
-// TODO: deprecate
-func (c *Client) ToggleSave(newsID int64, feedID int64) (bool, error) {
-	var x SavedItem
-	// Note: Ordering depends on order of struct
-	ok, err := c.e.Id(core.NewPK(feedID, newsID)).Get(&x)
-	if err != nil {
-		return false, err
-	}
-	if ok {
-		_, err := c.e.Delete(&x)
-		if err != nil {
-			return false, fmt.Errorf("db: failed to delete saved news: %v", err)
-		}
-		return false, nil
-	}
-	if _, err := c.e.InsertOne(&SavedItem{
-		NewsItemId: newsID,
-		FeedItemId: feedID,
-		Date:       time.Now(),
-	}); err != nil {
-		return false, fmt.Errorf("db: failed to save news: %v", err)
-	}
-	return true, nil
 }
 
 func (c *Client) SearchNews(filters ...Filter) ([]*ExtendedFeedItem, error) {

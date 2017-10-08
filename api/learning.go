@@ -8,10 +8,11 @@ import (
 
 type learningService struct {
 	dbClient *db.Client
+	dataPointClient *db.DataPointClient
 }
 
 func (s *learningService) LearnFromNewNews() error {
-	queue, err := s.dbClient.GetProcessQueue()
+	queue, err := s.dataPointClient.GetProcessQueue()
 	if err != nil {
 		return err
 	}
@@ -38,7 +39,7 @@ func (s *learningService) LearnFromNewNews() error {
 			seen[s] = struct{}{}
 			filtered = append(filtered, s)
 		}
-		if err := s.dbClient.MarkAsProcessed(q, filtered); err != nil {
+		if err := s.dataPointClient.MarkAsProcessed(q, filtered); err != nil {
 			return err
 		}
 	}
@@ -46,10 +47,10 @@ func (s *learningService) LearnFromNewNews() error {
 }
 
 func (s *learningService) HumanClassification(newsID int64, outcome db.UserClassification) error {
-	d, err := s.dbClient.GetDataPoint(newsID)
+	d, err := s.dataPointClient.GetDataPoint(newsID)
 	if err != nil {
 		return err
 	}
 	d.Outcome = outcome
-	return s.dbClient.SaveDataPoint(d)
+	return s.dataPointClient.SaveDataPoint(d)
 }

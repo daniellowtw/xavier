@@ -12,21 +12,27 @@ type Service struct {
 	*filterService
 }
 
-func NewService(e *db.Client) *Service {
+func NewService(client *db.Client) *Service {
 	return &Service{
 		NewsService: &NewsService{
-			dbClient: e,
+			dbClient: client,
+			saveItemClient: &db.SavedItemClient{
+				Engine: client.Engine,
+			},
 		},
 		FeedService: &FeedService{
-			dbClient: e,
+			dbClient: client,
 		},
 		learningService: &learningService{
-			dbClient: e,
+			dbClient: client,
+			dataPointClient: &db.DataPointClient{
+				Engine: client.Engine,
+			},
 		},
 		filterService: &filterService{
-			dbClient: e,
+			dbClient: client,
 			flagItemClient: &db.FlagItemClient{
-				Engine: e.Engine,
+				Engine: client.Engine,
 			},
 		},
 	}

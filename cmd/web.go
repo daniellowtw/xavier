@@ -30,6 +30,7 @@ func NewWebCmd() *cobra.Command {
 			fmt.Printf("Server running on port %d\n", Port)
 			fileServer := http.FileServer(http.Dir("./app/dist"))
 			r.PathPrefix("/web/").Handler(http.StripPrefix("/web/", fileServer))
+			// TODO: This should be nested under web.
 			r.PathPrefix("/static/").Handler(fileServer)
 			return http.ListenAndServe(fmt.Sprintf(":%d", Port), r)
 		},
