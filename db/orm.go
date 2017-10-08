@@ -11,6 +11,7 @@ import (
 	"github.com/go-xorm/xorm"
 )
 
+// Deprecate this and create multiple clients for each table instead.
 type Client struct {
 	e *xorm.Engine
 	*FeedRuleClient
@@ -31,6 +32,7 @@ func NewSqlite3Client(dbFile string, showSql bool, logLevel core.LogLevel) (*Cli
 		&SavedItem{},
 		&FeedRule{},
 		&TaggedItem{},
+		&flaggedItem{},
 	); err != nil {
 		return nil, err
 	}
@@ -252,6 +254,7 @@ func (c *Client) MarkAsRead(newsID int64) error {
 	return nil
 }
 
+// TODO: deprecate
 func (c *Client) ToggleSave(newsID int64, feedID int64) (bool, error) {
 	var x SavedItem
 	// Note: Ordering depends on order of struct

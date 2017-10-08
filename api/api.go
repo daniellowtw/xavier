@@ -25,6 +25,9 @@ func NewService(e *db.Client) *Service {
 		},
 		filterService: &filterService{
 			dbClient: e,
+			flagItemClient: &db.FlagItemClient{
+				Engine: e.Engine,
+			},
 		},
 	}
 }
