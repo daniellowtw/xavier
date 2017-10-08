@@ -26,5 +26,6 @@ func init() {
 		NewWebCmd(),
 		ImportFeedSourceFromFileCmd,
 		NewLearnCmd(),
+		AddFilterCmd,
 	)
 }

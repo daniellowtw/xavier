@@ -12,7 +12,7 @@
             <img v-bind:src="favIcon">
           </i>
         </span>
-        <span v-on:click="toggleShow" class="clickable">  
+        <span v-on:click="toggleShow" class="clickable">
           {{news.Title}}
         </span>
         <span class="entry-separator">•</span>
@@ -94,23 +94,23 @@ export default Vue.component('news-item', {
   .clickable {
     cursor: pointer;
   }
-  
+
   .read {
     font-size: small;
   }
-  
+
   .is-primary {
     color: #fff;
     background-color: #00d1b2;
   }
-  
+
   .sub {
     display: inline;
     color: #aaa;
     align-self: center;
     font-size: 0.7em;
   }
-  
+
   .entry-separator {
     margin-right: 5px;
     margin-left: 5px

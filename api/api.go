@@ -9,6 +9,7 @@ type Service struct {
 	*NewsService
 	*FeedService
 	*learningService
+	*filterService
 }
 
 func NewService(e *db.Client) *Service {
@@ -20,6 +21,9 @@ func NewService(e *db.Client) *Service {
 			dbClient: e,
 		},
 		learningService: &learningService{
+			dbClient: e,
+		},
+		filterService: &filterService{
 			dbClient: e,
 		},
 	}

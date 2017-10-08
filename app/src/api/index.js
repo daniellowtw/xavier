@@ -1,6 +1,6 @@
 import request from 'superagent'
 
-var __API__ = '/api'
+var __API__ = '/_api'
 export default {
   loadSources(errCb, successCb) {
     request.get(`${__API__}/feeds`)

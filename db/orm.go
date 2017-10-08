@@ -13,6 +13,7 @@ import (
 
 type Client struct {
 	e *xorm.Engine
+	*FeedRuleClient
 }
 
 func NewSqlite3Client(dbFile string, showSql bool, logLevel core.LogLevel) (*Client, error) {
@@ -28,10 +29,12 @@ func NewSqlite3Client(dbFile string, showSql bool, logLevel core.LogLevel) (*Cli
 		&DataPoint{},
 		&ProcessQueue{},
 		&SavedItem{},
+		&FeedRule{},
+		&TaggedItem{},
 	); err != nil {
 		return nil, err
 	}
-	return &Client{ee}, nil
+	return &Client{e: ee, FeedRuleClient: &FeedRuleClient{Engine: ee}}, nil
 }
 
 func (c *Client) UpdateFeedSource(f *FeedSource) error {
