@@ -1,0 +1,8 @@
+dist
+bin
+*.db
+node_modules
+.vscode
+.idea
+*.exe
+.cred.json

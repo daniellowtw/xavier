@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/daniellowtw/xavier/db"
+	client2 "github.com/daniellowtw/xavier/client"
 )
 
 // Service is implements the API
@@ -22,6 +23,7 @@ func NewService(client *db.Client) *Service {
 		},
 		FeedService: &FeedService{
 			dbClient: client,
+			httpClient: client2.NewDefaultClient(),
 		},
 		learningService: &learningService{
 			dbClient: client,

@@ -1,22 +1,20 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
-	"log"
-
-	"encoding/json"
-
-	"github.com/daniellowtw/xavier/client"
 	"github.com/daniellowtw/xavier/db"
 	"github.com/mmcdole/gofeed"
 )
 
 // FeedService is implements the API relating to feeds
 type FeedService struct {
-	dbClient *db.Client
+	dbClient   *db.Client
+	httpClient *http.Client
 }
 
 func (s *FeedService) ListAllFeeds() ([]*db.FeedSource, error) {
@@ -37,7 +35,7 @@ func (s *FeedService) AddFeed(url string) error {
 		return fmt.Errorf("api: feed %s already exists", url)
 	}
 	fp := gofeed.NewParser()
-	fp.Client = client.New()
+	fp.Client = s.httpClient
 	f, err := fp.ParseURL(url)
 	if err != nil {
 		return fmt.Errorf("add: cannot parse URL: %v", err)
@@ -73,7 +71,7 @@ func (s *FeedService) AddFeed(url string) error {
 // check for update and then store news
 func (s *FeedService) updateFeedFromURL(f *db.FeedSource) (int, error) {
 	fp := gofeed.NewParser()
-	fp.Client = client.New()
+	fp.Client = s.httpClient
 	gf, err := fp.ParseURL(f.UrlSource)
 	if err != nil {
 		return 0, err
@@ -144,7 +142,7 @@ func (s *FeedService) DebugFeed(id int64) ([]byte, error) {
 	}
 
 	fp := gofeed.NewParser()
-	fp.Client = client.New()
+	fp.Client = s.httpClient
 	gf, err := fp.ParseURL(f.UrlSource)
 	if err != nil {
 		return nil, err
