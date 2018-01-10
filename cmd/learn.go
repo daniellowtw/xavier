@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/daniellowtw/xavier/api"
+	"github.com/daniellowtw/xavier/cmd/service"
 	"github.com/daniellowtw/xavier/db"
 	"github.com/spf13/cobra"
 )
@@ -10,7 +11,7 @@ func NewLearnCmd() *cobra.Command {
 	return &cobra.Command{
 		Use: "learn",
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			e, err := newDBClientFromCmd(cmd)
+			e, err := service.NewDBClientFromCmd(cmd)
 			if err != nil {
 				return err
 			}

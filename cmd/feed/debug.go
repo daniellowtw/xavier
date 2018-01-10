@@ -1,25 +1,21 @@
-package cmd
+package feed
 
 import (
 	"fmt"
-	"strconv"
 
+	"github.com/daniellowtw/xavier/cmd/service"
 	"github.com/spf13/cobra"
 )
 
 var (
-	DebugCmd = &cobra.Command{
+	debugCmd = &cobra.Command{
 		Use: "debug <id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 1 {
-				return fmt.Errorf("Need one argument: <urL>")
-			}
-			u := args[0]
-			i, err := strconv.ParseInt(u, 10, 64)
+			i, err := extractInt1(args, "feed ID")
 			if err != nil {
 				return err
 			}
-			s, err := newServiceFromCmd(cmd)
+			s, err := service.NewServiceFromCmd(cmd)
 			if err != nil {
 				return err
 			}
@@ -29,3 +25,7 @@ var (
 		},
 	}
 )
+
+func init() {
+	RootCmd.AddCommand(debugCmd)
+}

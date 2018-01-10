@@ -1,15 +1,16 @@
-package cmd
+package feed
 
 import (
 	"fmt"
 
+	"github.com/daniellowtw/xavier/cmd/service"
 	"github.com/spf13/cobra"
 )
 
 var ListAllCmd = &cobra.Command{
 	Use: "list",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s, err := newServiceFromCmd(cmd)
+		s, err := service.NewServiceFromCmd(cmd)
 		if err != nil {
 			return err
 		}
@@ -22,4 +23,8 @@ var ListAllCmd = &cobra.Command{
 		}
 		return nil
 	},
+}
+
+func init() {
+	RootCmd.AddCommand(ListAllCmd)
 }

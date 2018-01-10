@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/daniellowtw/xavier/cmd/service"
 	"github.com/gilliek/go-opml/opml"
 	"github.com/spf13/cobra"
 )
@@ -26,7 +27,7 @@ var (
 				}
 				importCount++
 			}
-			s, err := newServiceFromCmd(cmd)
+			s, err := service.NewServiceFromCmd(cmd)
 			if err != nil {
 				return err
 			}

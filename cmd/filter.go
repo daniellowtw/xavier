@@ -5,6 +5,7 @@ import (
 
 	"strconv"
 
+	"github.com/daniellowtw/xavier/cmd/service"
 	"github.com/daniellowtw/xavier/db"
 	"github.com/spf13/cobra"
 )
@@ -26,7 +27,7 @@ var AddFilterCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("unknown input")
 		}
-		s, err := newServiceFromCmd(cmd)
+		s, err := service.NewServiceFromCmd(cmd)
 		if err != nil {
 			return err
 		}

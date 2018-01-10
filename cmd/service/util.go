@@ -1,7 +1,7 @@
 /*
 This file provides convenient function to produce structs that are configured by the flags
 */
-package cmd
+package service
 
 import (
 	"github.com/daniellowtw/xavier/api"
@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newDBClientFromCmd(cmd *cobra.Command) (*db.Client, error) {
+func NewDBClientFromCmd(cmd *cobra.Command) (*db.Client, error) {
 	dbName, err := cmd.Flags().GetString("db")
 	if err != nil {
 		return nil, err
@@ -27,8 +27,8 @@ func newDBClientFromCmd(cmd *cobra.Command) (*db.Client, error) {
 	return db.NewSqlite3Client(dbName, showSql, ll)
 }
 
-func newServiceFromCmd(cmd *cobra.Command) (*api.Service, error) {
-	c, err := newDBClientFromCmd(cmd)
+func NewServiceFromCmd(cmd *cobra.Command) (*api.Service, error) {
+	c, err := NewDBClientFromCmd(cmd)
 	if err != nil {
 		return nil, err
 	}

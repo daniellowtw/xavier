@@ -39,7 +39,7 @@ func NewSqlite3Client(dbFile string, showSql bool, logLevel core.LogLevel) (*Cli
 }
 
 func (c *Client) UpdateFeedSource(f *FeedSource) error {
-	_, err := c.e.Id(f.Id).Update(f)
+	_, err := c.e.Id(f.Id).UseBool().Update(f)
 	return err
 }
 
@@ -66,7 +66,7 @@ func (c *Client) DeleteFeedSource(id int64) error {
 
 func (c *Client) GetActiveFeedSources() ([]*FeedSource, error) {
 	var res []*FeedSource
-	err := c.e.Where("active = 1").Find(&res)
+	err := c.e.Where("active = '1'").Find(&res)
 	if err != nil {
 		return nil, err
 	}

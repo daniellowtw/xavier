@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/daniellowtw/xavier/api"
+	"github.com/daniellowtw/xavier/cmd/service"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 )
@@ -14,7 +15,7 @@ func NewWebCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "web",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			s, err := newServiceFromCmd(cmd)
+			s, err := service.NewServiceFromCmd(cmd)
 			if err != nil {
 				return err
 			}

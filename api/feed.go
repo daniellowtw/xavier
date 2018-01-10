@@ -107,10 +107,19 @@ func (s *FeedService) updateFeedFromURL(f *db.FeedSource) (int, error) {
 		}
 		updatedItemCount++
 	}
-	fmt.Printf("Updated db %d - %d items added.\n", f.Id, updatedItemCount)
+	fmt.Printf("Updated feed ID %d - %d items added.\n", f.Id, updatedItemCount)
 	f.LastChecked = time.Now()
 	s.dbClient.UpdateFeedSource(f)
 	return updatedItemCount, err
+}
+
+func (s *FeedService) ToggleActive(feedID int64) (bool, error) {
+	f, err := s.dbClient.GetFeedSource(feedID)
+	if err != nil {
+		return false, err
+	}
+	f.Active = !f.Active
+	return f.Active, s.dbClient.UpdateFeedSource(f)
 }
 
 func (s *FeedService) findFeedItemByGUID(feedID int64, guid string) (found bool, err error) {

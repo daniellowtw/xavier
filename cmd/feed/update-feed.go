@@ -1,9 +1,10 @@
-package cmd
+package feed
 
 import (
 	"fmt"
 	"strconv"
 
+	"github.com/daniellowtw/xavier/cmd/service"
 	"github.com/spf13/cobra"
 )
 
@@ -18,10 +19,14 @@ var UpdateFeedCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		s, err := newServiceFromCmd(cmd)
+		s, err := service.NewServiceFromCmd(cmd)
 		if err != nil {
 			return err
 		}
 		return s.UpdateFeed(i)
 	},
+}
+
+func init() {
+	RootCmd.AddCommand(UpdateFeedCmd)
 }

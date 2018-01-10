@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 
+	"github.com/daniellowtw/xavier/cmd/feed"
 	"github.com/spf13/cobra"
 )
 
@@ -17,15 +18,10 @@ func init() {
 	RootCmd.PersistentFlags().Bool("show-sql", false, "print out the sql statements")
 	RootCmd.PersistentFlags().Int("log-level", 3, "log level (0 for debug to 5 for fatal)")
 	RootCmd.AddCommand(
-		AddCmd,
-		UpdateAllCmd,
-		DebugCmd,
-		UpdateFeedCmd,
-		ListAllCmd,
-		DeleteCmd,
 		NewWebCmd(),
 		ImportFeedSourceFromFileCmd,
 		NewLearnCmd(),
 		AddFilterCmd,
+		feed.RootCmd,
 	)
 }
