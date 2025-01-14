@@ -3,7 +3,7 @@ package db
 import (
 	"fmt"
 
-	"github.com/go-xorm/xorm"
+	"xorm.io/xorm"
 )
 
 type UserClassification int
@@ -72,7 +72,7 @@ func (c *DataPointClient) GetDataPoint(newsID int64) (*DataPoint, error) {
 }
 
 func (c *DataPointClient) SaveDataPoint(point *DataPoint) error {
-	_, err := c.Engine.Id(point.Id).Update(point)
+	_, err := c.Engine.ID(point.Id).Update(point)
 	return err
 }
 

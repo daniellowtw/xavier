@@ -1,8 +1,9 @@
 package db
 
 import (
-	"github.com/go-xorm/xorm"
 	"fmt"
+
+	"xorm.io/xorm"
 )
 
 type TaggedItem struct {
@@ -19,7 +20,7 @@ func (c *TagItemClient) SetTags(feedID int64, newsId int64, tags []string) error
 	i := &TaggedItem{
 		NewsId: newsId,
 		FeedId: feedID,
-		Tags: tags,
+		Tags:   tags,
 	}
 	// try to insert
 	if _, err := c.Engine.InsertOne(i); err != nil {

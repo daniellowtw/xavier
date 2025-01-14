@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-xorm/core"
-	"github.com/go-xorm/xorm"
+	"xorm.io/xorm"
+	"xorm.io/xorm/log"
 )
 
 // Deprecate this and create multiple clients for each table instead.
@@ -16,7 +16,7 @@ type Client struct {
 	*FeedRuleClient
 }
 
-func NewSqlite3Client(dbFile string, showSql bool, logLevel core.LogLevel) (*Client, error) {
+func NewSqlite3Client(dbFile string, showSql bool, logLevel log.LogLevel) (*Client, error) {
 	ee, err := xorm.NewEngine("sqlite3", dbFile)
 	if err != nil {
 		return nil, err
@@ -39,13 +39,13 @@ func NewSqlite3Client(dbFile string, showSql bool, logLevel core.LogLevel) (*Cli
 }
 
 func (c *Client) UpdateFeedSource(f *FeedSource) error {
-	_, err := c.e.Id(f.Id).UseBool().Update(f)
+	_, err := c.e.ID(f.Id).UseBool().Update(f)
 	return err
 }
 
 func (c *Client) DeleteFeedSource(id int64) error {
 	var fs FeedSource
-	found, err := c.e.Id(id).Get(&fs)
+	found, err := c.e.ID(id).Get(&fs)
 	if err != nil {
 		return fmt.Errorf("db: %v", err)
 	}
@@ -79,7 +79,7 @@ func (c *Client) GetActiveFeedSourcesWithStats() ([]*FeedSourceWithUnread, error
 
 func (c *Client) GetNewsItem(id int64) (*FeedItem, error) {
 	var i FeedItem
-	ok, err := c.e.Id(id).Get(&i)
+	ok, err := c.e.ID(id).Get(&i)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (c *Client) CheckWhetherSourceExist(url string) (bool, error) {
 
 func (c *Client) GetFeedSource(id int64) (*FeedSource, error) {
 	var fs FeedSource
-	ok, err := c.e.Id(id).Get(&fs)
+	ok, err := c.e.ID(id).Get(&fs)
 	if !ok {
 		return nil, fmt.Errorf("db: not found")
 	}
@@ -197,7 +197,7 @@ func (c *Client) MarkAsReadMulti(newsID []int64) error {
 
 func (c *Client) MarkAsRead(newsID int64) error {
 	news := new(FeedItem)
-	ok, err := c.e.Id(newsID).Get(news)
+	ok, err := c.e.ID(newsID).Get(news)
 	if err != nil {
 		return err
 	}
@@ -205,7 +205,7 @@ func (c *Client) MarkAsRead(newsID int64) error {
 		return fmt.Errorf("db: not found")
 	}
 	news.Read = true
-	if _, err := c.e.Id(newsID).Cols("read").Update(news); err != nil {
+	if _, err := c.e.ID(newsID).Cols("read").Update(news); err != nil {
 		return fmt.Errorf("db: failed to update news: %v", err)
 	}
 	return nil

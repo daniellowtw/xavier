@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/go-xorm/xorm"
+	"xorm.io/xorm"
 )
 
 // TODO comments

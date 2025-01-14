@@ -3,7 +3,7 @@ package db
 import (
 	"fmt"
 
-	"github.com/go-xorm/xorm"
+	"xorm.io/xorm"
 )
 
 type RuleType int

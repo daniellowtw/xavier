@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-xorm/core"
-	"github.com/go-xorm/xorm"
+	"xorm.io/core"
+	"xorm.io/xorm"
 )
 
 type flaggedItem struct {
@@ -21,7 +21,7 @@ type FlagItemClient struct {
 func (c *FlagItemClient) FlagItem(newsID int64, feedID int64) (bool, error) {
 	var x flaggedItem
 	// Note: Ordering depends on order of struct
-	ok, err := c.Engine.Id(core.NewPK(feedID, newsID)).Get(&x)
+	ok, err := c.Engine.ID(core.NewPK(feedID, newsID)).Get(&x)
 	if err != nil {
 		return false, err
 	}
@@ -40,7 +40,7 @@ func (c *FlagItemClient) FlagItem(newsID int64, feedID int64) (bool, error) {
 
 func (c *FlagItemClient) RemoveFlag(newsID int64, feedID int64) (bool, error) {
 	var x flaggedItem
-	ok, err := c.Engine.Id(core.NewPK(feedID, newsID)).Get(&x)
+	ok, err := c.Engine.ID(core.NewPK(feedID, newsID)).Get(&x)
 	if err != nil {
 		return false, err
 	}

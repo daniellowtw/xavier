@@ -6,8 +6,8 @@ package service
 import (
 	"github.com/daniellowtw/xavier/api"
 	"github.com/daniellowtw/xavier/db"
-	"github.com/go-xorm/core"
 	"github.com/spf13/cobra"
+	"xorm.io/xorm/log"
 )
 
 func NewDBClientFromCmd(cmd *cobra.Command) (*db.Client, error) {
@@ -23,7 +23,7 @@ func NewDBClientFromCmd(cmd *cobra.Command) (*db.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	ll := core.LogLevel(logLevel)
+	ll := log.LogLevel(logLevel)
 	return db.NewSqlite3Client(dbName, showSql, ll)
 }
 

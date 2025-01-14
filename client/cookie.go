@@ -2,10 +2,10 @@ package client
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"os"
 	"time"
 )
 
@@ -46,7 +46,7 @@ func toCookie(c *cred) *cookiejar.Jar {
 }
 
 func loadFromFile(filePath string) *cred {
-	d, err := ioutil.ReadFile(filePath)
+	d, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil
 	}

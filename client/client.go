@@ -1,6 +1,7 @@
 package client
 
 import (
+	"log"
 	"net/http"
 )
 
@@ -14,7 +15,8 @@ type Option func(*http.Client)
 func WithFileCookie(filePath string) Option {
 	cred := loadFromFile(filePath)
 	if cred == nil {
-		panic("cannot load credentials from cookie")
+		log.Println("cannot load credentials from cookie")
+		return func(c *http.Client) {}
 	}
 	j := toCookie(cred)
 	if j == nil {

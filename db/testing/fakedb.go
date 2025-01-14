@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/daniellowtw/xavier/db"
-	"github.com/go-xorm/core"
+	"xorm.io/core"
 )
 
 var testFileName = "./for-testing.db"
